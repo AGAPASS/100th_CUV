@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>圣经和合本历史</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow-x: auto;
+            background: #000;
+            height: 100vh;
+        }
+
+        .container {
+            width: 17060px; /* 与背景图宽度一致 */
+            height: 806px; /* 与背景图高度一致 */
+            background-image: url('images/layer2/background_layer2.png'); /* 替换背景图路径 */
+            position: relative;
+        }
+
+        .hotspot {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .hotspot:hover {
+            transform: scale(1.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 999;
+            max-width: 80%;
+        }
+
+        .modal img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .music-control {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            z-index: 1000;
+            color: white;
+            cursor: pointer;
+        }
+
+        .rotate-tip {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            text-align: center;
+            padding-top: 30%;
+            z-index: 9999;
+        }
+
+        @media screen and (orientation: portrait) {
+            .rotate-tip {
+                display: block;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<div class="rotate-tip">请将手机横屏观看</div>
+<div class="music-control"><i class="fas fa-volume-up"></i></div>
+<div class="container">
+    <!-- 热点示例 - 需要根据实际位置调整 -->
+    <div class="hotspot" style="left: 700px; top: 300px;" data-img="images/layer3/1丝绸之路_画板 1.png"></div>
+    <div class="hotspot" style="left: 1950px; top: 220px;" data-img="images/layer3/2最古铁十字架_画板 1.png"></div>
+    <div class="hotspot" style="left: 3000px; top: 350px;" data-img="images/layer3/3景教_画板 1.png"></div>
+    <div class="hotspot" style="left: 4120px; top: 300px;" data-img="images/layer3/4流行中国碑_画板 1.png"></div>
+    <div class="hotspot" style="left: 5100px; top: 500px;" data-img="images/layer3/5聂斯多略派教徒墓碑_画板 1.png"></div>
+    <div class="hotspot" style="left: 5980px; top: 350px;" data-img="images/layer3/6也里可温教_画板 1.png"></div>
+    <div class="hotspot" style="left: 6700px; top: 500px;" data-img="images/layer3/7孟高维诺译本_画板 1.png"></div>
+    <div class="hotspot" style="left: 7350px; top: 30px;" data-img="images/layer3/9闭关锁国_画板 1.png"></div>
+    <div class="hotspot" style="left: 8300px; top: 445px;" data-img="images/layer3/8祖传天主十诫_画板 1.png"></div>
+    <div class="hotspot" style="left: 8350px; top: 350px;" data-img="images/layer3/10西学东渐_画板 1.png"></div>
+    <div class="hotspot" style="left: 8450px; top: 435px;" data-img="images/layer3/11徐光启与几何原本_画板 1.png"></div>
+    <div class="hotspot" style="left: 9300px; top: 430px;" data-img="images/layer3/12康熙与十字架（文字）_画板 1_画板 1.png"></div>
+    <div class="hotspot" style="left: 10400px; top: 350px;" data-img="images/layer3/13礼仪之争_画板 1.png"></div>
+    <div class="hotspot" style="left: 11010px; top: 690px;" data-img="images/layer3/14百年禁教_画板 1.png"></div>
+    <div class="hotspot" style="left: 11800px; top: 350px;" data-img="images/layer3/15新教第一人_画板 1.png"></div>
+    <div class="hotspot" style="left: 11700px; top: 600px;" data-img="images/layer3/16神天圣书_画板 1.png"></div>
+    <div class="hotspot" style="left: 12270px; top: 420px;" data-img="images/layer3/17中国第一位新教徒_画板 1.png"></div>
+    <div class="hotspot" style="left: 12800px; top: 300px;" data-img="images/layer3/18大规模中文译经（滑动文字）_画板 1_画板 1_画板 1.png"></div>
+    <div class="hotspot" style="left: 13500px; top: 170px;" data-img="images/layer3/19太平天国运动_画板 1.png"></div>
+    <div class="hotspot" style="left: 14600px; top: 150px;" data-img="images/layer3/21义和团运动_画板 1.png"></div>
+    <div class="hotspot" style="left: 15300px; top: 200px;" data-img="images/layer3/22辛亥革命_画板 1.png"></div>
+    <div class="hotspot" style="left: 16300px; top: 200px;" data-img="images/layer3/23五四运动_画板 1.png"></div>
+    <div class="hotspot" style="left: 15500px; top: 350px;" data-img="images/layer3/24官话和合本_画板 1.png"></div>
+
+</div>
+
+<div class="modal">
+    <span class="close-btn"><i class="fas fa-times"></i></span>
+    <img src="" alt="详情图片">
+</div>
+
+<audio id="bgm" loop>
+    <source src="audio/bgm.mp3" type="audio/mpeg"> <!-- 替换背景音乐 -->
+</audio>
+
+<script>
+    // 音乐控制
+    const musicControl = document.querySelector('.music-control');
+    const audio = document.getElementById('bgm');
+    let isMuted = false;
+
+    musicControl.addEventListener('click', () => {
+        isMuted = !isMuted;
+        audio.muted = isMuted;
+        musicControl.innerHTML = isMuted ?
+            '<i class="fas fa-volume-mute"></i>' :
+            '<i class="fas fa-volume-up"></i>';
+    });
+
+    // 弹窗控制
+    const hotspots = document.querySelectorAll('.hotspot');
+    const modal = document.querySelector('.modal');
+    const closeBtn = document.querySelector('.close-btn');
+
+    hotspots.forEach(hotspot => {
+        hotspot.addEventListener('click', (e) => {
+            const imgUrl = e.target.dataset.img;
+            modal.querySelector('img').src = imgUrl;
+            modal.style.display = 'block';
+        });
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    // 自动播放音乐（需要用户交互后）
+    document.addEventListener('click', function initAudio() {
+        audio.play();
+        document.removeEventListener('click', initAudio);
+    });
+
+    // 移动端横屏检测
+    window.addEventListener('orientationchange', () => {
+        if (window.orientation === 90 || window.orientation === -90) {
+            document.querySelector('.rotate-tip').style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>
