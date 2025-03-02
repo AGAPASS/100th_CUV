@@ -12,7 +12,7 @@
         }
 
         body {
-            overflow-x: auto;
+            overflow-x: hidden;
             background: #000;
             height: 100vh;
         }
@@ -20,8 +20,10 @@
         .container {
             width: 17060px; /* 与背景图宽度一致 */
             height: 806px; /* 与背景图高度一致 */
-            background-image: url('images/layer2/background_layer2.jpg'); /* 替换背景图路径 */
+            background-image: url('images/layer1/background_layer1.png'); /* 替换背景图路径 */
             position: relative;
+            transform: translateX(0);
+            transition: transform 0.5s ease;
         }
 
         .hotspot {
@@ -87,6 +89,154 @@
             z-index: 9999;
         }
 
+        /* 新增样式 */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            transition: opacity 1s ease;
+        }
+
+        .loading-text {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .cinematic-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 990;
+        }
+
+        .cinematic-bar {
+            position: absolute;
+            width: 100%;
+            height: 10%;
+            background: #000;
+            transition: height 1.5s ease;
+        }
+
+        .cinematic-bar.top {
+            top: 0;
+        }
+
+        .cinematic-bar.bottom {
+            bottom: 0;
+        }
+
+        .scroll-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 50px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .scroll-controls button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .scroll-controls button:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .intro-image {
+            position: absolute;
+            max-width: 400px;
+            max-height: 300px;
+            opacity: 0;
+            transition: opacity 1s ease;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        /* 新增朦胧效果覆盖层 */
+        .dreamy-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+            z-index: 95;
+            backdrop-filter: blur(2px);
+            transition: opacity 1.5s ease;
+        }
+
+        /* 新增弹出图片样式 */
+        .popup-image {
+            position: fixed;
+            max-width: 900px; /* 增大最大宽度 */
+            max-height: 700px; /* 增大最大高度 */
+            opacity: 0;
+            transform: scale(0.8);
+            z-index: 996; /* 高于朦胧层 */
+            pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .popup-image.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* 为全屏状态添加样式 */
+        .fullscreen-mode .cinematic-bar {
+            height: 0 !important;
+        }
+
+        .fullscreen-mode .dreamy-overlay {
+            opacity: 0;
+        }
+
+        .fullscreen-mode .popup-image {
+            opacity: 0;
+        }
+
         @media screen and (orientation: portrait) {
             .rotate-tip {
                 display: block;
@@ -96,6 +246,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
+<!-- 新增加载动画 -->
+<div class="loading-screen">
+    <div class="spinner"></div>
+    <div class="loading-text">正在加载...</div>
+</div>
+
+<!-- 新增电影感蒙版 -->
+<div class="cinematic-overlay">
+    <div class="cinematic-bar top"></div>
+    <div class="cinematic-bar bottom"></div>
+</div>
+
+<!-- 新增朦胧效果覆盖层 -->
+<div class="dreamy-overlay"></div>
+
 <div class="rotate-tip">请将手机横屏观看</div>
 <div class="music-control"><i class="fas fa-volume-up"></i></div>
 <div class="container">
@@ -131,6 +296,13 @@
     <img src="" alt="详情图片">
 </div>
 
+<!-- 新增滚动控制按钮 -->
+<div class="scroll-controls">
+    <button id="pause-btn"><i class="fas fa-pause"></i></button>
+    <button id="play-btn"><i class="fas fa-play"></i></button>
+    <button id="restart-btn"><i class="fas fa-redo"></i></button>
+</div>
+
 <audio id="bgm" loop>
     <source src="audio/bgm.mp3" type="audio/mpeg"> <!-- 替换背景音乐 -->
 </audio>
@@ -159,6 +331,7 @@
             const imgUrl = e.target.dataset.img;
             modal.querySelector('img').src = imgUrl;
             modal.style.display = 'block';
+            pauseScrolling(); // 点击热点时暂停滚动
         });
     });
 
@@ -178,6 +351,491 @@
             document.querySelector('.rotate-tip').style.display = 'none';
         }
     });
+
+    // 新增功能：加载动画、电影感蒙版和卷轴滚动
+    const loadingScreen = document.querySelector('.loading-screen');
+    const container = document.querySelector('.container');
+    const topBar = document.querySelector('.cinematic-bar.top');
+    const bottomBar = document.querySelector('.cinematic-bar.bottom');
+    const pauseBtn = document.getElementById('pause-btn');
+    const playBtn = document.getElementById('play-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const dreamyOverlay = document.querySelector('.dreamy-overlay');
+    const body = document.body;
+
+    // 图片显示和消失配置
+    const introImages = [
+        {
+            src: "images/layer3/1丝绸之路_画板 1.png", 
+            showAtPosition: 600, 
+            hideAtPosition: 1200,
+            top: 100, 
+            left: 50
+        },
+        {
+            src: "images/layer3/2最古铁十字架_画板 1.png", 
+            showAtPosition: 1800, 
+            hideAtPosition: 2300,
+            top: 150, 
+            left: 50
+        },
+        {
+            src: "images/layer3/3景教_画板 1.png", 
+            showAtPosition: 2900, 
+            hideAtPosition: 3400,
+            top: 120, 
+            left: 50
+        },
+        {
+            src: "images/layer3/4流行中国碑_画板 1.png", 
+            showAtPosition: 4000, 
+            hideAtPosition: 4500,
+            top: 100, 
+            left: 50
+        },
+        {
+            src: "images/layer3/5聂斯多略派教徒墓碑_画板 1.png", 
+            showAtPosition: 5000, 
+            hideAtPosition: 5500,
+            top: 150, 
+            left: 50
+        },
+        {
+            src: "images/layer3/6也里可温教_画板 1.png", 
+            showAtPosition: 5900, 
+            hideAtPosition: 6400,
+            top: 120, 
+            left: 50
+        },
+        {
+            src: "images/layer3/7孟高维诺译本_画板 1.png", 
+            showAtPosition: 6600, 
+            hideAtPosition: 7100,
+            top: 100, 
+            left: 50
+        },
+        {
+            src: "images/layer38祖传天主十诫_画板 1.png", 
+            showAtPosition: 7300, 
+            hideAtPosition: 7800,
+            top: 150, 
+            left: 50
+        },
+        {
+            src: "images/layer3/9闭关锁国_画板 1.png", 
+            showAtPosition: 8200, 
+            hideAtPosition: 8700,
+            top: 120, 
+            left: 50
+        },
+        {
+            src: "images/layer3/10西学东渐_画板 1.png", 
+            showAtPosition: 8700, 
+            hideAtPosition: 9200,
+            top: 100, 
+            left: 50
+        },
+        {
+            src: "images/layer3/11徐光启与几何原本_画板 1.png", 
+            showAtPosition: 9200, 
+            hideAtPosition: 9700,
+            top: 150, 
+            left: 50
+        },
+        {
+            src: "images/layer3/12康熙与十字架（文字）_画板 1_画板 1.png", 
+            showAtPosition: 9800, 
+            hideAtPosition: 10300,
+            top: 120, 
+            left: 50
+        },
+        {
+            src: "images/layer3/13礼仪之争_画板 1.png", 
+            showAtPosition: 10400, 
+            hideAtPosition: 10900,
+            top: 100, 
+            left: 50
+        },
+        {
+            src: "images/layer3/14百年禁教_画板 1.png", 
+            showAtPosition: 11000, 
+            hideAtPosition: 11500,
+            top: 150, 
+            left: 50
+        },
+        {
+            src: "images/layer3/15新教第一人_画板 1.png", 
+            showAtPosition: 11700, 
+            hideAtPosition: 12200,
+            top: 120, 
+            left: 50
+        },
+        {
+            src: "images/layer3/16神天圣书_画板 1.png", 
+            showAtPosition: 12300, 
+            hideAtPosition: 12800,
+            top: 100, 
+            left: 50
+        },
+        {
+            src: "images/layer3/17中国第一位新教徒_画板 1.png", 
+            showAtPosition: 12900, 
+            hideAtPosition: 13400,
+            top: 150, 
+            left: 50
+        },
+        {
+            src: "images/layer3/18大规模中文译经（滑动文字）_画板 1_画板 1_画板 1.png", 
+            showAtPosition: 13500, 
+            hideAtPosition: 14000,
+            top: 120, 
+            left: 50
+        },
+        {
+            src: "images/layer3/19太平天国运动_画板 1.png", 
+            showAtPosition: 14100, 
+            hideAtPosition: 14600,
+            top: 100, 
+            left: 50
+        },
+        {
+            src: "images/layer3/21义和团运动_画板 1.png", 
+            showAtPosition: 14700, 
+            hideAtPosition: 15200,
+            top: 150, 
+            left: 50
+        },
+        {
+            src: "images/layer3/22辛亥革命_画板 1.png", 
+            showAtPosition: 15300, 
+            hideAtPosition: 15800,
+            top: 120, 
+            left: 50
+        },
+        {
+            src: "images/layer3/23五四运动_画板 1.png", 
+            showAtPosition: 15900, 
+            hideAtPosition: 16400,
+            top: 100, 
+            left: 50
+        },
+        {
+            src: "images/layer3/24官话和合本_画板 1.png", 
+            showAtPosition: 16500, 
+            hideAtPosition: 17000,
+            top: 150, 
+            left: 50
+        }
+    ];
+
+    // 新增弹出图片配置
+    const popupImages = [
+        {
+            src: "images/layer1/copywriting/1.丝绸之路_画板 1.png", 
+            showAtPosition: 10, 
+            hideAtPosition: 800,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/2.最古铁十字架_画板 1.png", 
+            showAtPosition: 1000, 
+            hideAtPosition: 2000,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/3.景教入华_画板 1.png", 
+            showAtPosition: 2100, 
+            hideAtPosition: 3200,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/4. 大秦景教_画板 1.png", 
+            showAtPosition: 3300, 
+            hideAtPosition: 4200,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/5.退居边疆_画板 1.png", 
+            showAtPosition: 4300, 
+            hideAtPosition: 5000,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/6.景教复苏_画板 1.png", 
+            showAtPosition: 5100, 
+            hideAtPosition: 5800,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/7.天主教入华_画板 1.png", 
+            showAtPosition: 5900, 
+            hideAtPosition: 6500,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/8.闭关锁国_画板 1.png", 
+            showAtPosition: 6600, 
+            hideAtPosition: 7300,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/9.泰西儒士_画板 1.png", 
+            showAtPosition: 7400, 
+            hideAtPosition: 7700,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/10.西学东渐_画板 1.png", 
+            showAtPosition: 7800, 
+            hideAtPosition: 8400,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/11.帝师教士_画板 1.png", 
+            showAtPosition: 8500, 
+            hideAtPosition: 9300,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/12.利益之争_画板 1.png", 
+            showAtPosition: 9400, 
+            hideAtPosition: 10300,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/13.百年禁教_画板 1.png", 
+            showAtPosition: 10400, 
+            hideAtPosition: 11100,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/14.新教入华_画板 1.png", 
+            showAtPosition: 12500, 
+            hideAtPosition: 13300,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/15.被迫开放_画板 1.png", 
+            showAtPosition: 13400, 
+            hideAtPosition: 14200,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/16.太平天国运动_画板 1.png", 
+            showAtPosition: 14300, 
+            hideAtPosition: 15100,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/17.帝国覆灭_画板 1.png", 
+            showAtPosition: 15200, 
+            hideAtPosition: 16000,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/18.新文化运动_画板 1.png", 
+            showAtPosition: 16100, 
+            hideAtPosition: 16900,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        },
+        {
+            src: "images/layer1/copywriting/19.和合本面世_画板 1.png", 
+            showAtPosition: 16400, 
+            hideAtPosition: 17000,
+            top: "50%", 
+            left: "25%",
+            width: "800px"
+        }
+    ];
+
+    // 创建介绍图片元素
+    introImages.forEach((imgConfig, index) => {
+        const imgElement = document.createElement('img');
+        imgElement.src = imgConfig.src;
+        imgElement.className = 'intro-image';
+        imgElement.style.top = imgConfig.top + 'px';
+        imgElement.style.left = imgConfig.left + 'px';
+        container.appendChild(imgElement);
+        
+        // 保存元素引用
+        introImages[index].element = imgElement;
+    });
+
+    // 创建弹出图片元素
+    popupImages.forEach((imgConfig, index) => {
+        const imgElement = document.createElement('img');
+        imgElement.src = imgConfig.src;
+        imgElement.className = 'popup-image';
+        imgElement.style.top = imgConfig.top;
+        imgElement.style.left = imgConfig.left;
+        imgElement.style.width = imgConfig.width;
+        imgElement.style.transform = "translate(-50%, -50%) scale(0.8)"; // 居中显示
+        document.body.appendChild(imgElement);
+        
+        // 保存元素引用
+        popupImages[index].element = imgElement;
+    });
+
+    // 控制卷轴滚动
+    let scrollPosition = 0;
+    let isScrolling = false;
+    const scrollSpeed = 3; // 每帧移动的像素数
+    const maxScroll = container.offsetWidth - window.innerWidth;
+    
+    function startScrolling() {
+        isScrolling = true;
+        playBtn.style.display = 'none';
+        pauseBtn.style.display = 'inline-flex';
+        scrollAnimation();
+    }
+    
+    function pauseScrolling() {
+        isScrolling = false;
+        playBtn.style.display = 'inline-flex';
+        pauseBtn.style.display = 'none';
+    }
+    
+    function resetScrolling() {
+        scrollPosition = 0;
+        updateScrollPosition();
+        pauseScrolling();
+    }
+
+    function scrollAnimation() {
+        if (!isScrolling) return;
+        
+        if (scrollPosition < maxScroll) {
+            scrollPosition += scrollSpeed;
+            updateScrollPosition();
+            
+            // 检查并更新介绍图片的显示状态
+            updateIntroImages();
+            
+            requestAnimationFrame(scrollAnimation);
+        } else {
+            pauseScrolling();
+            // 动画结束后，自动退出到全屏状态
+            exitToCinematics();
+        }
+    }
+    
+    function updateScrollPosition() {
+        container.style.transform = `translateX(-${scrollPosition}px)`;
+    }
+    
+    function updateIntroImages() {
+        introImages.forEach(imgConfig => {
+            if (scrollPosition >= imgConfig.showAtPosition && scrollPosition < imgConfig.hideAtPosition) {
+                imgConfig.element.style.opacity = '1';
+            } else {
+                imgConfig.element.style.opacity = '0';
+            }
+        });
+
+        // 更新弹出图片显示状态
+        popupImages.forEach(imgConfig => {
+            if (scrollPosition >= imgConfig.showAtPosition && scrollPosition < imgConfig.hideAtPosition) {
+                imgConfig.element.classList.add('active');
+            } else {
+                imgConfig.element.classList.remove('active');
+            }
+        });
+    }
+
+    // 新增函数：退出到全屏状态
+    function exitToCinematics() {
+        // 等待最后一个图片显示完毕后再退出
+        setTimeout(() => {
+            // 添加全屏模式类
+            body.classList.add('fullscreen-mode');
+            
+            // 隐藏控制按钮
+            document.querySelector('.scroll-controls').style.opacity = '0';
+            setTimeout(() => {
+                document.querySelector('.scroll-controls').style.display = 'none';
+            }, 1000);
+            
+            // 显示热点
+            hotspots.forEach(hotspot => {
+                hotspot.style.opacity = '1';
+            });
+            
+            // 隐藏所有弹出图片
+            popupImages.forEach(imgConfig => {
+                imgConfig.element.classList.remove('active');
+            });
+        }, 1500);
+    }
+
+    // 加载完成后的初始化
+    window.addEventListener('load', () => {
+        // 隐藏加载屏幕
+        setTimeout(() => {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 1000);
+        }, 1500);
+        
+        // 显示电影感黑边
+        setTimeout(() => {
+            topBar.style.height = '8%';
+            bottomBar.style.height = '8%';
+            
+            // 开始卷轴滚动
+            setTimeout(startScrolling, 1000);
+        }, 500);
+        
+        // 隐藏热点，直到动画完成
+        hotspots.forEach(hotspot => {
+            hotspot.style.opacity = '0';
+            hotspot.style.transition = 'opacity 0.5s ease';
+        });
+    });
+
+    // 绑定控制按钮事件
+    pauseBtn.addEventListener('click', pauseScrolling);
+    playBtn.addEventListener('click', startScrolling);
+    restartBtn.addEventListener('click', resetScrolling);
+    
+    // 初始显示播放按钮
+    pauseBtn.style.display = 'none';
 </script>
 </body>
 </html>
