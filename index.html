@@ -24,6 +24,7 @@
             position: relative;
             transform: translateX(0);
             transition: transform 0.5s ease;
+            will-change: transform;
         }
 
         .hotspot {
@@ -34,6 +35,8 @@
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.3s;
+            opacity: 0;
+            will-change: opacity, transform;
         }
 
         .hotspot:hover {
@@ -140,6 +143,7 @@
             height: 10%;
             background: #000;
             transition: height 1.5s ease;
+            will-change: height;
         }
 
         .cinematic-bar.top {
@@ -161,6 +165,8 @@
             border-radius: 50px;
             display: flex;
             gap: 10px;
+            transition: opacity 0.5s ease;
+            will-change: opacity;
         }
 
         .scroll-controls button {
@@ -191,6 +197,8 @@
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
             z-index: 100;
             pointer-events: none;
+            will-change: opacity;
+            transform: translateZ(0);
         }
 
         /* 新增朦胧效果覆盖层 */
@@ -204,7 +212,9 @@
             pointer-events: none;
             z-index: 95;
             backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
             transition: opacity 1.5s ease;
+            will-change: opacity;
         }
 
         /* 新增弹出图片样式 */
@@ -213,15 +223,21 @@
             max-width: 900px; /* 增大最大宽度 */
             max-height: 700px; /* 增大最大高度 */
             opacity: 0;
-            transform: scale(0.8);
+            transform: translate(-50%, -50%) scale(0.8) translateZ(0); /* 居中显示并使用硬件加速 */
             z-index: 996; /* 高于朦胧层 */
             pointer-events: none;
             transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            will-change: opacity, transform; /* 提示浏览器这些属性会变化 */
+            -webkit-transform: translate(-50%, -50%) scale(0.8) translateZ(0);
+            top: 50%;
+            left: 25%;
+            width: 800px;
         }
 
         .popup-image.active {
             opacity: 1;
-            transform: scale(1);
+            transform: translate(-50%, -50%) scale(1) translateZ(0);
+            -webkit-transform: translate(-50%, -50%) scale(1) translateZ(0);
         }
 
         /* 为全屏状态添加样式 */
@@ -362,6 +378,45 @@
     const restartBtn = document.getElementById('restart-btn');
     const dreamyOverlay = document.querySelector('.dreamy-overlay');
     const body = document.body;
+    
+    // 创建完整的性能监控器
+    const performanceMonitor = {
+        frameCount: 0,
+        lastTime: performance.now(),
+        fps: 60,
+        lowPerformanceMode: false,
+        
+        update() {
+            this.frameCount++;
+            const now = performance.now();
+            const elapsed = now - this.lastTime;
+            
+            if (elapsed >= 1000) {
+                this.fps = this.frameCount / (elapsed / 1000);
+                this.frameCount = 0;
+                this.lastTime = now;
+                
+                // 检测低性能，并切换模式
+                if (this.fps < 30 && !this.lowPerformanceMode) {
+                    this.lowPerformanceMode = true;
+                    this.enableLowPerformanceMode();
+                } else if (this.fps > 40 && this.lowPerformanceMode) {
+                    this.lowPerformanceMode = false;
+                    this.disableLowPerformanceMode();
+                }
+            }
+        },
+        
+        enableLowPerformanceMode() {
+            console.log("启用低性能模式");
+            document.body.classList.add('low-performance-mode');
+        },
+        
+        disableLowPerformanceMode() {
+            console.log("禁用低性能模式");
+            document.body.classList.remove('low-performance-mode');
+        }
+    };
 
     // 图片显示和消失配置
     const introImages = [
@@ -533,196 +588,186 @@
         {
             src: "images/layer1/copywriting/1.丝绸之路_画板 1.png", 
             showAtPosition: 10, 
-            hideAtPosition: 800,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 800
         },
         {
             src: "images/layer1/copywriting/2.最古铁十字架_画板 1.png", 
             showAtPosition: 1000, 
-            hideAtPosition: 2000,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 2000
         },
         {
             src: "images/layer1/copywriting/3.景教入华_画板 1.png", 
             showAtPosition: 2100, 
-            hideAtPosition: 3200,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 3200
         },
         {
             src: "images/layer1/copywriting/4. 大秦景教_画板 1.png", 
             showAtPosition: 3300, 
-            hideAtPosition: 4200,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 4200
         },
         {
             src: "images/layer1/copywriting/5.退居边疆_画板 1.png", 
             showAtPosition: 4300, 
-            hideAtPosition: 5000,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 5000
         },
         {
             src: "images/layer1/copywriting/6.景教复苏_画板 1.png", 
             showAtPosition: 5100, 
-            hideAtPosition: 5800,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 5800
         },
         {
             src: "images/layer1/copywriting/7.天主教入华_画板 1.png", 
             showAtPosition: 5900, 
-            hideAtPosition: 6500,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 6500
         },
         {
             src: "images/layer1/copywriting/8.闭关锁国_画板 1.png", 
             showAtPosition: 6600, 
-            hideAtPosition: 7300,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 7300
         },
         {
             src: "images/layer1/copywriting/9.泰西儒士_画板 1.png", 
             showAtPosition: 7400, 
-            hideAtPosition: 7700,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 7700
         },
         {
             src: "images/layer1/copywriting/10.西学东渐_画板 1.png", 
             showAtPosition: 7800, 
-            hideAtPosition: 8400,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 8400
         },
         {
             src: "images/layer1/copywriting/11.帝师教士_画板 1.png", 
             showAtPosition: 8500, 
-            hideAtPosition: 9300,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 9300
         },
         {
             src: "images/layer1/copywriting/12.利益之争_画板 1.png", 
             showAtPosition: 9400, 
-            hideAtPosition: 10300,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 10300
         },
         {
             src: "images/layer1/copywriting/13.百年禁教_画板 1.png", 
             showAtPosition: 10400, 
-            hideAtPosition: 11100,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            hideAtPosition: 10900
         },
         {
             src: "images/layer1/copywriting/14.新教入华_画板 1.png", 
-            showAtPosition: 12500, 
-            hideAtPosition: 13300,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            showAtPosition: 11100, 
+            hideAtPosition: 11900
         },
         {
             src: "images/layer1/copywriting/15.被迫开放_画板 1.png", 
-            showAtPosition: 13400, 
-            hideAtPosition: 14200,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            showAtPosition: 12000, 
+            hideAtPosition: 12600
         },
         {
             src: "images/layer1/copywriting/16.太平天国运动_画板 1.png", 
-            showAtPosition: 14300, 
-            hideAtPosition: 15100,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            showAtPosition: 12700, 
+            hideAtPosition: 13500
         },
         {
             src: "images/layer1/copywriting/17.帝国覆灭_画板 1.png", 
-            showAtPosition: 15200, 
-            hideAtPosition: 16000,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            showAtPosition: 13600, 
+            hideAtPosition: 14300
         },
         {
             src: "images/layer1/copywriting/18.新文化运动_画板 1.png", 
-            showAtPosition: 16100, 
-            hideAtPosition: 16900,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            showAtPosition: 15000, 
+            hideAtPosition: 16000
         },
         {
             src: "images/layer1/copywriting/19.和合本面世_画板 1.png", 
-            showAtPosition: 16400, 
-            hideAtPosition: 17000,
-            top: "50%", 
-            left: "25%",
-            width: "800px"
+            showAtPosition: 14400, 
+            hideAtPosition: 14900
         }
     ];
 
-    // 创建介绍图片元素
-    introImages.forEach((imgConfig, index) => {
-        const imgElement = document.createElement('img');
-        imgElement.src = imgConfig.src;
-        imgElement.className = 'intro-image';
-        imgElement.style.top = imgConfig.top + 'px';
-        imgElement.style.left = imgConfig.left + 'px';
-        container.appendChild(imgElement);
+    // 采用更高效的预加载方法
+    function preloadImages() {
+        console.log("开始预加载图片...");
+        const loadPromises = [];
         
-        // 保存元素引用
-        introImages[index].element = imgElement;
-    });
+        // 收集所有需要预加载的图片
+        const imagesToPreload = [];
+        introImages.forEach(img => imagesToPreload.push(img.src));
+        popupImages.forEach(img => imagesToPreload.push(img.src));
+        
+        // 创建一个Promise来监控每个图片的加载
+        imagesToPreload.forEach(src => {
+            loadPromises.push(new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(src);
+                img.onerror = () => {
+                    console.error(`无法加载图片: ${src}`);
+                    resolve(src); // 即使出错也继续
+                };
+                img.src = src;
+            }));
+        });
+        
+        // 当所有图片加载完毕后，才继续
+        return Promise.all(loadPromises).then(() => {
+            console.log("所有图片预加载完成!");
+        });
+    }
 
-    // 创建弹出图片元素
-    popupImages.forEach((imgConfig, index) => {
-        const imgElement = document.createElement('img');
-        imgElement.src = imgConfig.src;
-        imgElement.className = 'popup-image';
-        imgElement.style.top = imgConfig.top;
-        imgElement.style.left = imgConfig.left;
-        imgElement.style.width = imgConfig.width;
-        imgElement.style.transform = "translate(-50%, -50%) scale(0.8)"; // 居中显示
-        document.body.appendChild(imgElement);
+    // 创建介绍图片元素 - 优化DOM操作
+    function createIntroImages() {
+        const fragment = document.createDocumentFragment();
         
-        // 保存元素引用
-        popupImages[index].element = imgElement;
-    });
+        introImages.forEach((imgConfig, index) => {
+            const imgElement = new Image();
+            imgElement.src = imgConfig.src;
+            imgElement.className = 'intro-image';
+            imgElement.style.top = imgConfig.top + 'px';
+            imgElement.style.left = imgConfig.left + 'px';
+            imgElement.loading = "eager"; // 使用原生懒加载
+            
+            fragment.appendChild(imgElement);
+            
+            // 保存元素引用
+            introImages[index].element = imgElement;
+        });
+        
+        container.appendChild(fragment);
+    }
+
+    // 创建弹出图片元素 - 优化DOM操作
+    function createPopupImages() {
+        const fragment = document.createDocumentFragment();
+        
+        popupImages.forEach((imgConfig, index) => {
+            const imgElement = new Image();
+            imgElement.src = imgConfig.src;
+            imgElement.className = 'popup-image';
+            imgElement.loading = "eager"; // 使用原生懒加载
+            
+            fragment.appendChild(imgElement);
+            
+            // 保存元素引用
+            popupImages[index].element = imgElement;
+        });
+        
+        document.body.appendChild(fragment);
+    }
 
     // 控制卷轴滚动
     let scrollPosition = 0;
     let isScrolling = false;
-    const scrollSpeed = 3; // 每帧移动的像素数
+    let scrollSpeed = 3; // 每帧移动的像素数
     const maxScroll = container.offsetWidth - window.innerWidth;
+    let lastFrameTime = 0; // 上一帧的时间戳
+    const targetFPS = 60; // 目标帧率
+    const frameDuration = 1000 / targetFPS; // 每帧理想持续时间 (ms)
     
     function startScrolling() {
+        if (isScrolling) return;
+        
         isScrolling = true;
         playBtn.style.display = 'none';
         pauseBtn.style.display = 'inline-flex';
-        scrollAnimation();
+        lastFrameTime = performance.now();
+        requestAnimationFrame(scrollAnimation);
     }
     
     function pauseScrolling() {
@@ -737,16 +782,32 @@
         pauseScrolling();
     }
 
-    function scrollAnimation() {
+    // 优化的动画帧率控制
+    function scrollAnimation(timestamp) {
         if (!isScrolling) return;
         
+        // 更新性能监控
+        performanceMonitor.update();
+        
+        // 计算帧与帧之间的时间差
+        const elapsed = timestamp - lastFrameTime;
+        
+        // 基于实际帧率计算移动距离，确保匀速滚动
+        const pixelsToMove = (scrollSpeed * elapsed) / frameDuration;
+        
         if (scrollPosition < maxScroll) {
-            scrollPosition += scrollSpeed;
+            scrollPosition += pixelsToMove;
+            if (scrollPosition > maxScroll) scrollPosition = maxScroll;
+            
+            // 高效更新位置
             updateScrollPosition();
             
-            // 检查并更新介绍图片的显示状态
-            updateIntroImages();
+            // 仅在确实移动了的情况下更新图片
+            if (pixelsToMove > 0) {
+                updateVisibleImages();
+            }
             
+            lastFrameTime = timestamp;
             requestAnimationFrame(scrollAnimation);
         } else {
             pauseScrolling();
@@ -755,30 +816,58 @@
         }
     }
     
+    // 更高效的位置更新
     function updateScrollPosition() {
+        // 使用transform代替修改left属性，获得更好的性能
         container.style.transform = `translateX(-${scrollPosition}px)`;
     }
     
-    function updateIntroImages() {
-        introImages.forEach(imgConfig => {
-            if (scrollPosition >= imgConfig.showAtPosition && scrollPosition < imgConfig.hideAtPosition) {
-                imgConfig.element.style.opacity = '1';
-            } else {
-                imgConfig.element.style.opacity = '0';
-            }
-        });
-
-        // 更新弹出图片显示状态
-        popupImages.forEach(imgConfig => {
-            if (scrollPosition >= imgConfig.showAtPosition && scrollPosition < imgConfig.hideAtPosition) {
-                imgConfig.element.classList.add('active');
-            } else {
-                imgConfig.element.classList.remove('active');
+    // 更高效的图片可见性更新
+    const visibilityCache = new Map();
+    let activeSectionStart = 0;
+    let activeSectionEnd = 0;
+    const bufferDistance = 500; // 提前500像素加载图片
+    
+    function updateVisibleImages() {
+        // 计算当前可见区域范围（添加缓冲区）
+        const viewportStart = Math.max(0, scrollPosition - bufferDistance);
+        const viewportEnd = scrollPosition + window.innerWidth + bufferDistance;
+        
+        // 如果视口范围没有明显变化，跳过更新
+        if (Math.abs(viewportStart - activeSectionStart) < 100 && 
+            Math.abs(viewportEnd - activeSectionEnd) < 100) {
+            return;
+        }
+        
+        activeSectionStart = viewportStart;
+        activeSectionEnd = viewportEnd;
+        
+        // 仅处理当前视口附近的图片
+        updateImageVisibility(popupImages);
+    }
+    
+    function updateImageVisibility(images) {
+        const currentPosition = scrollPosition;
+        
+        images.forEach((imgConfig, index) => {
+            const imgElement = imgConfig.element;
+            const shouldBeVisible = currentPosition >= imgConfig.showAtPosition && 
+                                    currentPosition < imgConfig.hideAtPosition;
+            
+            // 检查缓存，避免不必要的DOM操作
+            const cachedState = visibilityCache.get(imgElement);
+            if (cachedState !== shouldBeVisible) {
+                if (shouldBeVisible) {
+                    imgElement.classList.add('active');
+                } else {
+                    imgElement.classList.remove('active');
+                }
+                visibilityCache.set(imgElement, shouldBeVisible);
             }
         });
     }
 
-    // 新增函数：退出到全屏状态
+    // 退出到全屏状态
     function exitToCinematics() {
         // 等待最后一个图片显示完毕后再退出
         setTimeout(() => {
@@ -800,34 +889,123 @@
             popupImages.forEach(imgConfig => {
                 imgConfig.element.classList.remove('active');
             });
+            
+            // 回到最左侧，并切换背景图片
+            setTimeout(() => {
+                scrollPosition = 0;
+                container.style.transition = 'transform 1s ease, background-image 1s ease';
+                // 切换背景图片
+                container.style.backgroundImage = 'url("images/layer2/background_layer2.jpg")';
+                updateScrollPosition();
+                
+                // 恢复transition设置
+                setTimeout(() => {
+                    container.style.transition = 'transform 0.5s ease';
+                    // 启用手指拖动功能
+                    enableDragging();
+                }, 1000);
+            }, 500);
         }, 1500);
     }
 
-    // 加载完成后的初始化
-    window.addEventListener('load', () => {
+    // 新增拖动功能
+    let isDragging = false;
+    let startX = 0;
+    let startScrollPosition = 0;
+    
+    function enableDragging() {
+        console.log("启用拖动功能");
+        
+        // 处理触摸事件（移动设备）
+        container.addEventListener('touchstart', handleDragStart, { passive: false });
+        container.addEventListener('touchmove', handleDragMove, { passive: false });
+        container.addEventListener('touchend', handleDragEnd);
+        
+        // 处理鼠标事件（桌面设备）
+        container.addEventListener('mousedown', handleDragStart);
+        document.addEventListener('mousemove', handleDragMove);
+        document.addEventListener('mouseup', handleDragEnd);
+    }
+    
+    function handleDragStart(e) {
+        if (isScrolling) return; // 如果正在自动滚动，则不启用拖动
+        
+        isDragging = true;
+        startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        startScrollPosition = scrollPosition;
+        
+        // 阻止默认行为，防止滚动冲突
+        if (e.cancelable) {
+            e.preventDefault();
+        }
+        
+        // 暂时取消transition，以获得更流畅的拖动效果
+        container.style.transition = 'none';
+    }
+    
+    function handleDragMove(e) {
+        if (!isDragging) return;
+        
+        // 计算拖动距离
+        const x = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        const deltaX = startX - x;
+        
+        // 更新滚动位置
+        let newPosition = startScrollPosition + deltaX;
+        
+        // 限制滚动范围
+        newPosition = Math.max(0, Math.min(newPosition, maxScroll));
+        
+        // 更新位置
+        scrollPosition = newPosition;
+        updateScrollPosition();
+        
+        // 阻止默认行为，防止滚动冲突
+        if (e.cancelable) {
+            e.preventDefault();
+        }
+    }
+    
+    function handleDragEnd(e) {
+        if (!isDragging) return;
+        
+        isDragging = false;
+        
+        // 恢复transition效果
+        container.style.transition = 'transform 0.5s ease';
+    }
+
+    // 初始化应用
+    async function initializeApp() {
+        console.log("开始初始化应用...");
+        
+        // 首先加载所有图片
+        await preloadImages();
+        
+        // 然后创建DOM元素
+        createIntroImages();
+        createPopupImages();
+        
         // 隐藏加载屏幕
         setTimeout(() => {
             loadingScreen.style.opacity = '0';
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
             }, 1000);
-        }, 1500);
-        
-        // 显示电影感黑边
-        setTimeout(() => {
-            topBar.style.height = '8%';
-            bottomBar.style.height = '8%';
             
-            // 开始卷轴滚动
-            setTimeout(startScrolling, 1000);
+            // 显示电影感黑边
+            setTimeout(() => {
+                topBar.style.height = '8%';
+                bottomBar.style.height = '8%';
+                
+                // 开始卷轴滚动
+                setTimeout(startScrolling, 1000);
+            }, 500);
         }, 500);
-        
-        // 隐藏热点，直到动画完成
-        hotspots.forEach(hotspot => {
-            hotspot.style.opacity = '0';
-            hotspot.style.transition = 'opacity 0.5s ease';
-        });
-    });
+    }
+
+    // 页面加载完成后初始化
+    window.addEventListener('load', initializeApp);
 
     // 绑定控制按钮事件
     pauseBtn.addEventListener('click', pauseScrolling);
@@ -836,6 +1014,47 @@
     
     // 初始显示播放按钮
     pauseBtn.style.display = 'none';
+
+    // 监听窗口大小变化，动态调整性能
+    window.addEventListener('resize', () => {
+        // 根据窗口大小调整滚动速度
+        if (window.innerWidth < 768) {
+            scrollSpeed = 2; // 较小的屏幕滚动慢一些
+        } else {
+            scrollSpeed = 3; // 大屏幕正常速度
+        }
+    });
+    
+    // 检测设备性能
+    function checkDevicePerformance() {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!gl) {
+            // WebGL不可用，假定低性能设备
+            return false;
+        }
+        
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        if (!debugInfo) {
+            return true; // 无法确定，假定正常性能
+        }
+        
+        const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        // 检查是否为已知的低性能GPU
+        if (/(intel|microsoft|swiftshader)/i.test(renderer)) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // 根据设备性能调整设置
+    if (!checkDevicePerformance()) {
+        console.log("检测到低性能设备，调整设置");
+        scrollSpeed = 2;
+        // 禁用一些效果
+        document.body.classList.add('low-performance-mode');
+    }
 </script>
 </body>
 </html>
