@@ -18,7 +18,7 @@
             --black: #100b07;
             --source-width: 17060;
             --source-height: 806;
-            --narrative-bg: url("images/layer1/background_layer1.png");
+            --narrative-bg: url("images/layer1/background_layer1.jpg");
             --explore-bg: url("images/layer2/background_layer2.jpg");
         }
 
@@ -286,13 +286,18 @@
             z-index: 12;
             left: clamp(12px, 3.4vw, 64px);
             top: 50%;
-            width: min(46vw, 76vh, 760px);
-            aspect-ratio: 1;
+            width: min(39vw, 68vh, 680px);
             transform: translateY(-50%) translateX(-18px);
             opacity: 0;
             pointer-events: none;
             filter: drop-shadow(0 12px 25px rgba(53, 29, 11, 0.2));
             transition: opacity 0.6s ease, transform 0.75s cubic-bezier(0.2, 0.7, 0.2, 1);
+        }
+
+        .narration.is-right {
+            right: clamp(12px, 3.4vw, 64px);
+            left: auto;
+            transform: translateY(-50%) translateX(18px);
         }
 
         .narration.is-visible {
@@ -307,8 +312,39 @@
         .narration img {
             display: block;
             width: 100%;
-            height: 100%;
+            height: auto;
+            max-height: 70vh;
             object-fit: contain;
+        }
+
+        .narration-read {
+            position: absolute;
+            right: 7%;
+            bottom: -6px;
+            min-height: 34px;
+            padding: 0 13px;
+            color: #fff3d5;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            border: 1px solid rgba(225, 178, 91, 0.52);
+            border-radius: 999px;
+            background: rgba(37, 19, 9, 0.86);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            pointer-events: none;
+        }
+
+        .narration.is-visible .narration-read {
+            pointer-events: auto;
+        }
+
+        .narration-read:hover,
+        .narration-read:focus-visible {
+            color: #fff9e9;
+            border-color: rgba(244, 201, 113, 0.86);
+            background: rgba(105, 52, 21, 0.92);
+            outline: none;
         }
 
         .hud {
@@ -322,10 +358,6 @@
 
         body.is-started .hud {
             opacity: 1;
-        }
-
-        body.is-explore #play-button {
-            display: none;
         }
 
         .site-mark,
@@ -397,6 +429,12 @@
             border-color: rgba(244, 201, 113, 0.82);
             outline: none;
             transform: translateY(-1px);
+        }
+
+        .hud-button:disabled {
+            opacity: 0.62;
+            cursor: wait;
+            transform: none;
         }
 
         .hud-button .icon {
@@ -730,6 +768,63 @@
             backdrop-filter: blur(7px) saturate(0.7);
         }
 
+        .chapter-dialog {
+            width: min(88vw, 560px);
+            max-height: 84vh;
+            margin: auto;
+            padding: clamp(28px, 5vw, 48px);
+            overflow: auto;
+            color: #3b2414;
+            border: 1px solid rgba(119, 67, 28, 0.3);
+            border-radius: 18px;
+            background:
+                linear-gradient(rgba(244, 227, 194, 0.96), rgba(235, 209, 162, 0.96)),
+                #ead5aa;
+            box-shadow: 0 26px 80px rgba(0, 0, 0, 0.58);
+        }
+
+        .chapter-dialog::backdrop {
+            background: rgba(12, 8, 5, 0.76);
+            backdrop-filter: blur(7px) saturate(0.72);
+        }
+
+        .chapter-dialog .eyebrow {
+            margin: 0 0 10px;
+            color: #9b3c26;
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+        }
+
+        .chapter-dialog h2 {
+            margin: 0 0 18px;
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 500;
+        }
+
+        .chapter-dialog p {
+            margin: 0;
+            font-size: clamp(17px, 2.4vw, 21px);
+            line-height: 1.85;
+        }
+
+        .chapter-dialog-close {
+            margin-top: 26px;
+            min-height: 40px;
+            padding: 0 22px;
+            color: #fff4dc;
+            border: 1px solid rgba(107, 49, 25, 0.35);
+            border-radius: 999px;
+            background: #833523;
+            cursor: pointer;
+        }
+
+        .chapter-dialog-close:hover,
+        .chapter-dialog-close:focus-visible {
+            background: #a0442b;
+            outline: none;
+        }
+
         .detail-shell {
             position: relative;
             width: min(92vw, calc(84vh * 1.5472), 1320px);
@@ -825,7 +920,22 @@
 
             .narration {
                 left: 8px;
-                width: min(50vw, 82vh);
+                width: min(56vw, 78vh);
+            }
+
+            .narration.is-right {
+                right: 8px;
+                left: auto;
+            }
+
+            .narration img {
+                max-height: 66vh;
+            }
+
+            .narration-read {
+                right: 5%;
+                min-height: 32px;
+                font-size: 12px;
             }
 
             .hotspot::after {
@@ -864,8 +974,9 @@
         <div class="reveal-edge left" aria-hidden="true"></div>
         <div class="reveal-edge right" aria-hidden="true"></div>
 
-        <aside id="narration" class="narration" aria-live="polite">
+        <aside id="narration" class="narration" aria-live="polite" aria-label="当前历史章节导览">
             <img id="narration-image" src="" alt="">
+            <button id="narration-read" class="narration-read" type="button">阅读文字</button>
         </aside>
 
         <div class="hud">
@@ -875,9 +986,9 @@
             </div>
 
             <div class="top-actions">
-                <button id="mode-button" class="hud-button" type="button" aria-label="从头观看自动导览">
-                    <span class="icon" aria-hidden="true">↶</span>
-                    <span class="label">观看导览</span>
+                <button id="mode-button" class="hud-button" type="button" aria-label="进入手动章节导览">
+                    <span class="icon" aria-hidden="true">卷</span>
+                    <span class="label">章节导览</span>
                 </button>
                 <button id="music-button" class="hud-button" type="button" aria-label="暂停背景音乐" aria-pressed="true">
                     <span id="music-icon" class="icon" aria-hidden="true">♫</span>
@@ -890,9 +1001,8 @@
                 <strong id="chapter-label">1 · 丝绸之路</strong>
             </div>
 
-            <div class="timeline-controls" aria-label="时间轴播放控制">
+            <div class="timeline-controls" aria-label="时间轴浏览控制">
                 <div class="control-cluster">
-                    <button id="play-button" class="round-button" type="button" aria-label="暂停自动导览">Ⅱ</button>
                     <button id="restart-button" class="round-button" type="button" aria-label="回到时间轴起点">↶</button>
                 </div>
                 <div id="progress-wrap" class="progress-wrap">
@@ -910,7 +1020,7 @@
                 <h1 id="opening-title">千年薪火<br>百年和合</h1>
                 <p class="subtitle">沿一轴古卷，回望基督教传入中国<br>与中文圣经翻译的千年足迹</p>
                 <button id="open-scroll" class="open-scroll" type="button" disabled>画卷加载中…</button>
-                <p class="opening-hint">启卷后进入自由探索 · 左右拖动并点击光点查看详情</p>
+                <p class="opening-hint">启卷后自由探索 · 可随时切换章节导览</p>
             </div>
         </section>
 
@@ -922,6 +1032,13 @@
         </div>
 
         <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+        <dialog id="chapter-dialog" class="chapter-dialog" aria-labelledby="chapter-dialog-title">
+            <p class="eyebrow">CHAPTER READING</p>
+            <h2 id="chapter-dialog-title">历史章节</h2>
+            <p id="chapter-dialog-summary"></p>
+            <button id="chapter-dialog-close" class="chapter-dialog-close" type="button">返回长卷</button>
+        </dialog>
 
         <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-heading">
             <h2 id="detail-heading" class="sr-only">历史事件详情</h2>
@@ -950,30 +1067,29 @@
 
             const SOURCE_WIDTH = 17060;
             const SOURCE_HEIGHT = 806;
-            const NARRATIVE_BACKGROUND = "images/layer1/background_layer1.png";
+            const NARRATIVE_BACKGROUND = "images/layer1/background_layer1.jpg";
             const EXPLORE_BACKGROUND = "images/layer2/background_layer2.jpg";
-            const AUTO_SPEED = 180;
 
             const scenes = [
-                { title: "丝绸之路", start: 0, end: 900, image: "images/layer1/copywriting/1.丝绸之路_画板 1.png" },
-                { title: "最古铁十字架", start: 900, end: 2050, image: "images/layer1/copywriting/2.最古铁十字架_画板 1.png" },
-                { title: "景教入华", start: 2050, end: 3250, image: "images/layer1/copywriting/3.景教入华_画板 1.png" },
-                { title: "大秦景教", start: 3250, end: 4250, image: "images/layer1/copywriting/4. 大秦景教_画板 1.png" },
-                { title: "退居边疆", start: 4250, end: 5050, image: "images/layer1/copywriting/5.退居边疆_画板 1.png" },
-                { title: "景教复苏", start: 5050, end: 5850, image: "images/layer1/copywriting/6.景教复苏_画板 1.png" },
-                { title: "天主教入华", start: 5850, end: 6550, image: "images/layer1/copywriting/7.天主教入华_画板 1.png" },
-                { title: "闭关锁国", start: 6550, end: 7350, image: "images/layer1/copywriting/8.闭关锁国_画板 1.png" },
-                { title: "泰西儒士", start: 7350, end: 7800, image: "images/layer1/copywriting/9.泰西儒士_画板 1.png" },
-                { title: "西学东渐", start: 7800, end: 8500, image: "images/layer1/copywriting/10.西学东渐_画板 1.png" },
-                { title: "帝师教士", start: 8500, end: 9400, image: "images/layer1/copywriting/11.帝师教士_画板 1.png" },
-                { title: "礼仪之争", start: 9400, end: 10350, image: "images/layer1/copywriting/12.利益之争_画板 1.png" },
-                { title: "百年禁教", start: 10350, end: 11050, image: "images/layer1/copywriting/13.百年禁教_画板 1.png" },
-                { title: "新教入华", start: 11050, end: 12000, image: "images/layer1/copywriting/14.新教入华_画板 1.png" },
-                { title: "被迫开放", start: 12000, end: 12700, image: "images/layer1/copywriting/15.被迫开放_画板 1.png" },
-                { title: "太平天国运动", start: 12700, end: 13600, image: "images/layer1/copywriting/16.太平天国运动_画板 1.png" },
-                { title: "帝国覆灭", start: 13600, end: 14400, image: "images/layer1/copywriting/17.帝国覆灭_画板 1.png" },
-                { title: "和合本面世", start: 14400, end: 15000, image: "images/layer1/copywriting/19.和合本面世_画板 1.png" },
-                { title: "新文化运动", start: 15000, end: SOURCE_WIDTH, image: "images/layer1/copywriting/18.新文化运动_画板 1.png" }
+                { title: "丝绸之路", start: 0, end: 900, side: "right", image: "images/layer1/copywriting-optimized/01.webp", summary: "张骞出使西域，在大漠中开辟出一条贯通东西、满载辉煌的道路。" },
+                { title: "最古铁十字架", start: 900, end: 2050, side: "left", image: "images/layer1/copywriting-optimized/02.webp", summary: "三国孙吴年间的遗物，为基督教早期传入古代中国的历史提供了珍贵线索。" },
+                { title: "景教入华", start: 2050, end: 3250, side: "right", image: "images/layer1/copywriting-optimized/03.webp", summary: "唐代重臣房玄龄奉命迎接景教使团入城，景教由此正式进入中国。" },
+                { title: "大秦景教", start: 3250, end: 4250, side: "left", image: "images/layer1/copywriting-optimized/04.webp", summary: "建中二年奉皇命立碑，记录景教在华百余年的兴盛与译经历程。" },
+                { title: "退居边疆", start: 4250, end: 5050, side: "right", image: "images/layer1/copywriting-optimized/05.webp", summary: "唐末以后，景教逐渐退居内蒙古、新疆等地，并进入蒙古王室之中。" },
+                { title: "景教复苏", start: 5050, end: 5850, side: "left", image: "images/layer1/copywriting-optimized/06.webp", summary: "蒙古帝国入主中原后景教再度活跃，信徒在当时被统称为“也里可温”。" },
+                { title: "天主教入华", start: 5850, end: 6550, side: "right", image: "images/layer1/copywriting-optimized/07.webp", summary: "孟高维诺出使中国；其圣经译本虽已失传，相关工作仍保存在写给教皇的信中。" },
+                { title: "闭关锁国", start: 6550, end: 7350, side: "left", image: "images/layer1/copywriting-optimized/08.webp", summary: "郑和下西洋后，明朝实施海禁并修建长城，传教活动再次受阻。" },
+                { title: "泰西儒士", start: 7350, end: 7800, side: "right", image: "images/layer1/copywriting-optimized/09.webp", summary: "数代传教士被拒于国门之外后，利玛窦以西方器物和学识敲开了明朝大门。" },
+                { title: "西学东渐", start: 7800, end: 8500, side: "left", image: "images/layer1/copywriting-optimized/10.webp", summary: "来华传教士将西方科学文化引入中国，推动了知识、技术与思想的交流。" },
+                { title: "帝师教士", start: 8500, end: 9400, side: "right", image: "images/layer1/copywriting-optimized/11.webp", summary: "清初皇室礼待传教士，顺治称汤若望为“玛法”，康熙亦留下宗教诗作。" },
+                { title: "礼仪之争", start: 9400, end: 10350, side: "left", image: "images/layer1/copywriting-optimized/12.webp", summary: "是否尊重中国祭祖与尊儒传统，引发教廷内部长期争论，并波及在华传教。" },
+                { title: "百年禁教", start: 10350, end: 11050, side: "right", image: "images/layer1/copywriting-optimized/13.webp", summary: "礼仪之争触怒皇帝，清政府随后实行长期禁教政策，传教活动再度受挫。" },
+                { title: "新教入华", start: 11050, end: 12000, side: "left", image: "images/layer1/copywriting-optimized/14.webp", summary: "1807年马礼逊抵达广州，新教由此进入中国，并逐渐扎根发展。" },
+                { title: "被迫开放", start: 12000, end: 12700, side: "right", image: "images/layer1/copywriting-optimized/15.webp", summary: "《南京条约》签订后，大量传教士来华办学、办医，并参与社会文化变迁。" },
+                { title: "太平天国运动", start: 12700, end: 13600, side: "left", image: "images/layer1/copywriting-optimized/16.webp", summary: "1851年太平天国政权建立，历时十四年，极大动摇了清朝统治。" },
+                { title: "帝国覆灭", start: 13600, end: 14400, side: "right", image: "images/layer1/copywriting-optimized/17.webp", summary: "辛亥革命终结封建帝制，开启建立民主共和国的历史进程。" },
+                { title: "新文化运动", start: 14400, end: 15000, side: "left", image: "images/layer1/copywriting-optimized/18.webp", summary: "1915年起，知识分子高举民主与科学旗帜，反对旧礼教并追求平等自由。" },
+                { title: "和合本面世", start: 15000, end: SOURCE_WIDTH, side: "right", image: "images/layer1/copywriting-optimized/19.webp", summary: "历经近三十年翻译、战乱与人事变迁，《官话和合本》终于出版发行。" }
             ];
 
             const events = [
@@ -1008,9 +1124,9 @@
             const hotspotLayer = document.getElementById("hotspot-layer");
             const narration = document.getElementById("narration");
             const narrationImage = document.getElementById("narration-image");
+            const narrationRead = document.getElementById("narration-read");
             const opening = document.getElementById("opening");
             const openScrollButton = document.getElementById("open-scroll");
-            const playButton = document.getElementById("play-button");
             const restartButton = document.getElementById("restart-button");
             const modeButton = document.getElementById("mode-button");
             const modeButtonLabel = modeButton.querySelector(".label");
@@ -1024,6 +1140,10 @@
             const chapterLabel = document.getElementById("chapter-label");
             const toast = document.getElementById("toast");
             const audio = document.getElementById("bgm");
+            const chapterDialog = document.getElementById("chapter-dialog");
+            const chapterDialogTitle = document.getElementById("chapter-dialog-title");
+            const chapterDialogSummary = document.getElementById("chapter-dialog-summary");
+            const chapterDialogClose = document.getElementById("chapter-dialog-close");
             const detailDialog = document.getElementById("detail-dialog");
             const detailHeading = document.getElementById("detail-heading");
             const detailShell = document.getElementById("detail-shell");
@@ -1038,11 +1158,10 @@
             let maxScroll = 0;
             let scrollPosition = 0;
             let mode = "explore";
-            let playing = false;
             let started = false;
             let activeSceneIndex = -1;
-            let lastFrameTime = performance.now();
-            let resumeAfterDialog = false;
+            let narrativeReady = false;
+            let narrativeLoadPromise = null;
             let lastFocusedHotspot = null;
             let toastTimer = 0;
             let pointerId = null;
@@ -1056,10 +1175,6 @@
 
             function sourcePosition() {
                 return scale ? scrollPosition / scale : 0;
-            }
-
-            function maxSourcePosition() {
-                return scale ? maxScroll / scale : SOURCE_WIDTH;
             }
 
             function nearestEvent(position) {
@@ -1112,18 +1227,36 @@
             }
 
             function preloadNarration(index) {
-                if (!scenes[index] || scenes[index].preloaded) return;
-                scenes[index].preloaded = true;
-                const image = new Image();
-                image.src = scenes[index].image;
+                if (!scenes[index]) return Promise.resolve({ loaded: false });
+                if (!scenes[index].preloadPromise) {
+                    scenes[index].preloadPromise = preloadImage(scenes[index].image);
+                }
+                return scenes[index].preloadPromise;
+            }
+
+            function sceneIndexAt(position) {
+                const index = scenes.findIndex((scene) => position >= scene.start && position < scene.end);
+                return index === -1 ? scenes.length - 1 : index;
+            }
+
+            function ensureNarrativeReady(index) {
+                if (!narrativeLoadPromise) {
+                    narrativeLoadPromise = Promise.all([
+                        preloadImage(NARRATIVE_BACKGROUND),
+                        preloadNarration(index)
+                    ]).then((results) => {
+                        narrativeReady = results.every((result) => result.loaded);
+                        return narrativeReady;
+                    });
+                }
+                return narrativeLoadPromise;
             }
 
             function updateStoryState() {
                 const position = sourcePosition();
 
                 if (mode === "tour") {
-                    let nextIndex = scenes.findIndex((scene) => position >= scene.start && position < scene.end);
-                    if (nextIndex === -1) nextIndex = scenes.length - 1;
+                    const nextIndex = sceneIndexAt(position);
 
                     if (nextIndex !== activeSceneIndex) {
                         activeSceneIndex = nextIndex;
@@ -1131,48 +1264,55 @@
                         narration.classList.remove("is-visible");
                         window.setTimeout(() => {
                             if (mode !== "tour" || activeSceneIndex !== nextIndex) return;
+                            narration.classList.toggle("is-right", scene.side === "right");
                             narrationImage.src = scene.image;
-                            narrationImage.alt = `${scene.title}章节说明`;
+                            narrationImage.alt = `${scene.title}：${scene.summary}`;
+                            narrationRead.setAttribute("aria-label", `阅读“${scene.title}”文字版`);
                             narration.classList.add("is-visible");
                         }, 170);
                         preloadNarration(nextIndex + 1);
                     }
 
-                    modeEyebrow.textContent = playing ? "AUTO NARRATIVE" : "NARRATIVE PAUSED";
+                    modeEyebrow.textContent = "MANUAL NARRATIVE";
                     chapterLabel.textContent = scenes[activeSceneIndex]?.title || "历史长卷";
                 } else {
                     const event = nearestEvent(position + window.innerWidth / Math.max(scale, 0.001) / 2);
                     narration.classList.remove("is-visible");
-                    modeEyebrow.textContent = playing ? "AUTO EXPLORE" : "FREE EXPLORE";
+                    modeEyebrow.textContent = "FREE EXPLORE";
                     chapterLabel.textContent = `${event.id} · ${event.title}`;
                 }
-            }
-
-            function updatePlayButton() {
-                playButton.textContent = playing ? "Ⅱ" : "▶";
-                playButton.setAttribute("aria-label", playing ? "暂停自动导览" : "继续自动导览");
-                updateStoryState();
-            }
-
-            function setPlaying(nextPlaying) {
-                playing = Boolean(nextPlaying) && mode === "tour" && scrollPosition < maxScroll;
-                lastFrameTime = performance.now();
-                updatePlayButton();
             }
 
             function setMode(nextMode, options = {}) {
                 mode = nextMode;
                 const isExplore = mode === "explore";
                 document.body.classList.toggle("is-explore", isExplore);
-                modeButton.setAttribute("aria-label", isExplore ? "从头观看自动导览" : "切换到自由探索");
-                modeButtonLabel.textContent = isExplore ? "观看导览" : "自由探索";
-                modeButton.querySelector(".icon").textContent = isExplore ? "↶" : "⌁";
+                modeButton.setAttribute("aria-label", isExplore ? "进入手动章节导览" : "切换到自由探索");
+                modeButtonLabel.textContent = isExplore ? "章节导览" : "自由探索";
+                modeButton.querySelector(".icon").textContent = isExplore ? "卷" : "览";
                 activeSceneIndex = -1;
                 updateStoryState();
 
                 if (options.announce) {
-                    showToast(isExplore ? "已进入自由探索：拖动、滚轮或方向键浏览，点击光点查看详情" : "已回到自动导览");
+                    showToast(isExplore ? "自由探索：拖动浏览，点击光点查看详情" : "手动章节导览：拖动画卷，文案将随历史位置切换");
                 }
+            }
+
+            async function enterTour() {
+                const index = sceneIndexAt(sourcePosition());
+                modeButton.disabled = true;
+                modeButtonLabel.textContent = "导览加载中";
+                const loaded = narrativeReady || await ensureNarrativeReady(index);
+                modeButton.disabled = false;
+
+                if (!loaded) {
+                    narrativeLoadPromise = null;
+                    modeButtonLabel.textContent = "章节导览";
+                    showToast("导览素材暂未加载成功，请稍后重试");
+                    return;
+                }
+
+                setMode("tour", { announce: true });
             }
 
             function showToast(message) {
@@ -1180,6 +1320,18 @@
                 toast.textContent = message;
                 toast.classList.add("is-visible");
                 toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 3800);
+            }
+
+            function openChapterReading() {
+                const scene = scenes[activeSceneIndex] || scenes[sceneIndexAt(sourcePosition())];
+                chapterDialogTitle.textContent = scene.title;
+                chapterDialogSummary.textContent = scene.summary;
+                chapterDialog.showModal();
+                chapterDialogClose.focus({ preventScroll: true });
+            }
+
+            function closeChapterReading() {
+                if (chapterDialog.open) chapterDialog.close();
             }
 
             function updateMusicButton() {
@@ -1211,8 +1363,6 @@
 
             function openDetail(event, hotspot) {
                 if (pointerTravel > 8) return;
-                resumeAfterDialog = playing;
-                setPlaying(false);
                 lastFocusedHotspot = hotspot;
                 detailHeading.textContent = event.title;
                 detailShell.classList.toggle("is-composite", Boolean(event.background && event.text));
@@ -1258,35 +1408,12 @@
                 hotspotLayer.appendChild(fragment);
             }
 
-            function animate(timestamp) {
-                const elapsedSeconds = Math.min((timestamp - lastFrameTime) / 1000, 0.08);
-                lastFrameTime = timestamp;
-
-                if (started && playing && !detailDialog.open) {
-                    setScrollPosition(scrollPosition + AUTO_SPEED * scale * elapsedSeconds);
-                    if (scrollPosition >= maxScroll - 0.5) {
-                        setPlaying(false);
-                        if (mode === "tour") {
-                            window.setTimeout(() => {
-                                if (mode !== "tour") return;
-                                setMode("explore", { announce: true });
-                            }, 900);
-                        } else {
-                            showToast("已到达时间轴末端，可向左拖动回看");
-                        }
-                    }
-                }
-
-                requestAnimationFrame(animate);
-            }
-
             function handlePointerDown(event) {
-                if (!started || detailDialog.open || event.button !== 0 || event.target.closest("button, input")) return;
+                if (!started || detailDialog.open || chapterDialog.open || event.button !== 0 || event.target.closest("button, input")) return;
                 pointerId = event.pointerId;
                 pointerStartX = event.clientX;
                 pointerStartScroll = scrollPosition;
                 pointerTravel = 0;
-                setPlaying(false);
                 stage.classList.add("is-dragging");
                 stage.setPointerCapture(pointerId);
             }
@@ -1303,9 +1430,6 @@
                 if (stage.hasPointerCapture(pointerId)) stage.releasePointerCapture(pointerId);
                 pointerId = null;
                 stage.classList.remove("is-dragging");
-                if (pointerTravel > 8 && mode === "tour") {
-                    setMode("explore", { announce: false });
-                }
                 window.setTimeout(() => { pointerTravel = 0; }, 0);
             }
 
@@ -1318,7 +1442,6 @@
 
                 window.setTimeout(() => {
                     setMode("explore", { announce: false });
-                    setPlaying(false);
                     showToast("自由探索：左右拖动、滚轮或方向键浏览，点击光点查看详情");
                 }, 2250);
             }
@@ -1326,14 +1449,10 @@
             async function prepareExperience() {
                 resizeTimeline();
                 buildHotspots();
-                preloadNarration(0);
-                preloadNarration(1);
 
                 const criticalLoad = Promise.all([
                     preloadImage(EXPLORE_BACKGROUND)
                 ]);
-                preloadImage(NARRATIVE_BACKGROUND);
-                preloadImage(scenes[0].image);
                 const safetyTimeout = new Promise((resolve) => window.setTimeout(resolve, 12000));
                 await Promise.race([criticalLoad, safetyTimeout]);
                 openScrollButton.disabled = false;
@@ -1342,37 +1461,32 @@
 
             openScrollButton.addEventListener("click", startExperience);
 
-            playButton.addEventListener("click", () => {
-                if (scrollPosition >= maxScroll - 1) seekToSource(0);
-                setPlaying(!playing);
-            });
-
             restartButton.addEventListener("click", () => {
                 seekToSource(0);
-                if (mode === "tour") setPlaying(true);
                 showToast("已回到时间轴起点");
             });
 
             modeButton.addEventListener("click", () => {
                 if (mode === "tour") {
                     setMode("explore", { announce: true });
-                    setPlaying(false);
                 } else {
-                    seekToSource(0);
-                    setMode("tour", { announce: true });
-                    setPlaying(true);
+                    enterTour();
                 }
+            });
+
+            narrationRead.addEventListener("click", openChapterReading);
+            chapterDialogClose.addEventListener("click", closeChapterReading);
+            chapterDialog.addEventListener("click", (event) => {
+                if (event.target === chapterDialog) closeChapterReading();
             });
 
             musicButton.addEventListener("click", toggleMusic);
             audio.addEventListener("play", updateMusicButton);
             audio.addEventListener("pause", updateMusicButton);
 
-            timelineRange.addEventListener("pointerdown", () => setPlaying(false));
             timelineRange.addEventListener("input", () => {
                 const ratio = Number(timelineRange.value) / 1000;
                 setScrollPosition(maxScroll * ratio);
-                if (mode === "tour") setMode("explore", { announce: false });
             });
 
             stage.addEventListener("pointerdown", handlePointerDown);
@@ -1381,35 +1495,27 @@
             stage.addEventListener("pointercancel", handlePointerUp);
 
             stage.addEventListener("wheel", (event) => {
-                if (!started || detailDialog.open) return;
+                if (!started || detailDialog.open || chapterDialog.open) return;
                 event.preventDefault();
-                setPlaying(false);
-                if (mode === "tour") setMode("explore", { announce: false });
                 const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
                 setScrollPosition(scrollPosition + delta * 1.2);
             }, { passive: false });
 
             window.addEventListener("keydown", (event) => {
-                if (!started || detailDialog.open || event.target.matches("input, button")) return;
+                if (!started || detailDialog.open || chapterDialog.open || event.target.matches("input, button")) return;
                 const step = event.shiftKey ? window.innerWidth * 0.75 : 120;
-                if (["ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) {
+                if (["ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End"].includes(event.key)) {
                     event.preventDefault();
                 }
 
                 if (event.key === "ArrowLeft" || event.key === "PageUp") {
-                    setPlaying(false);
-                    setMode("explore", { announce: false });
                     setScrollPosition(scrollPosition - step);
                 } else if (event.key === "ArrowRight" || event.key === "PageDown") {
-                    setPlaying(false);
-                    setMode("explore", { announce: false });
                     setScrollPosition(scrollPosition + step);
                 } else if (event.key === "Home") {
                     setScrollPosition(0);
                 } else if (event.key === "End") {
                     setScrollPosition(maxScroll);
-                } else if (event.key === " ") {
-                    setPlaying(!playing);
                 }
             });
 
@@ -1419,15 +1525,12 @@
             });
             detailDialog.addEventListener("close", () => {
                 if (lastFocusedHotspot) lastFocusedHotspot.focus({ preventScroll: true });
-                if (resumeAfterDialog) setPlaying(true);
-                resumeAfterDialog = false;
             });
 
             window.addEventListener("resize", resizeTimeline, { passive: true });
             window.addEventListener("orientationchange", resizeTimeline, { passive: true });
 
             prepareExperience();
-            requestAnimationFrame(animate);
         })();
     </script>
 </body>
