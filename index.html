@@ -2,1063 +2,1437 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>千年薪火 百年和合</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#171008">
+    <meta name="description" content="沿历史长卷，探索基督教传入中国与中文圣经翻译的千年轨迹。">
+    <title>千年薪火 · 百年和合</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
+        :root {
+            color-scheme: dark;
+            --ink: #26170d;
+            --paper: #ead5aa;
+            --paper-light: #f7edda;
+            --cinnabar: #8d2f20;
+            --gold: #d8a143;
+            --gold-bright: #f2c66a;
+            --black: #100b07;
+            --source-width: 17060;
+            --source-height: 806;
+            --narrative-bg: url("images/layer1/background_layer1.png");
+            --explore-bg: url("images/layer2/background_layer2.jpg");
+        }
+
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
         }
 
+        html,
         body {
-            overflow-x: hidden;
-            background: #000;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: var(--black);
+            font-family: "STKaiti", "KaiTi", "FangSong", "Noto Serif SC", serif;
         }
 
-        .container {
-            width: 17060px; /* 与背景图宽度一致 */
-            height: 806px; /* 与背景图高度一致 */
-            background-image: url('images/layer1/background_layer1.png'); /* 替换背景图路径 */
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .app {
             position: relative;
-            transform: translateX(0);
-            transition: transform 0.5s ease;
+            width: 100%;
+            height: 100%;
+            isolation: isolate;
+            background:
+                radial-gradient(circle at 50% 48%, rgba(113, 68, 31, 0.2), transparent 38%),
+                #0e0906;
+        }
+
+        .stage {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            background: #0d0906;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .stage.is-dragging {
+            cursor: grabbing;
+        }
+
+        .scroll-mask {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            clip-path: inset(0 50% 0 50%);
+            filter: saturate(0.9) brightness(0.82);
+            transition:
+                clip-path 2.2s cubic-bezier(0.65, 0, 0.18, 1),
+                filter 1.4s ease 0.7s;
+        }
+
+        body.is-started .scroll-mask {
+            clip-path: inset(0 0 0 0);
+            filter: saturate(1) brightness(1);
+        }
+
+        .timeline {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background-image: var(--narrative-bg);
+            background-size: 100% 100%;
+            background-position: left center;
+            background-repeat: no-repeat;
             will-change: transform;
+            transition: opacity 0.45s ease, filter 0.45s ease;
+        }
+
+        body.is-explore .timeline {
+            background-image: var(--explore-bg);
+        }
+
+        .timeline::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(90deg, rgba(35, 19, 8, 0.2), transparent 2.5%, transparent 97.5%, rgba(35, 19, 8, 0.24)),
+                linear-gradient(180deg, rgba(42, 22, 8, 0.12), transparent 14%, transparent 86%, rgba(42, 22, 8, 0.14));
+            mix-blend-mode: multiply;
+        }
+
+        .reveal-edge {
+            position: fixed;
+            z-index: 28;
+            top: 5.5vh;
+            bottom: 5.5vh;
+            left: 50%;
+            width: 12px;
+            opacity: 0;
+            pointer-events: none;
+            border: 1px solid rgba(249, 214, 141, 0.48);
+            background: linear-gradient(90deg, #4e2b13, #c59346 42%, #6a3a18 74%, #2d180c);
+            box-shadow: 0 0 22px rgba(0, 0, 0, 0.75), 0 0 5px rgba(240, 191, 95, 0.42);
+        }
+
+        body.is-started .reveal-edge.left {
+            animation: unfurl-left 2.2s cubic-bezier(0.65, 0, 0.18, 1) both;
+        }
+
+        body.is-started .reveal-edge.right {
+            animation: unfurl-right 2.2s cubic-bezier(0.65, 0, 0.18, 1) both;
+        }
+
+        @keyframes unfurl-left {
+            0% { left: calc(50% - 6px); opacity: 1; }
+            84% { opacity: 1; }
+            100% { left: -14px; opacity: 0; }
+        }
+
+        @keyframes unfurl-right {
+            0% { left: calc(50% - 6px); opacity: 1; }
+            84% { opacity: 1; }
+            100% { left: calc(100% + 2px); opacity: 0; }
+        }
+
+        .cinematic-bars {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .cinematic-bars::before,
+        .cinematic-bars::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: max(4.5vh, env(safe-area-inset-top));
+            background: linear-gradient(#080503, #0c0805);
+            box-shadow: 0 2px 18px rgba(0, 0, 0, 0.42);
+        }
+
+        .cinematic-bars::before {
+            top: 0;
+        }
+
+        .cinematic-bars::after {
+            bottom: 0;
+            transform: rotate(180deg);
+        }
+
+        .hotspot-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            opacity: 0;
+            transition: opacity 0.8s ease 1.6s;
+        }
+
+        body.is-started .hotspot-layer {
+            opacity: 1;
         }
 
         .hotspot {
+            --marker-size: clamp(32px, 3.1vw, 48px);
             position: absolute;
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s;
-            opacity: 0;
-            will-change: opacity, transform;
-        }
-
-        .hotspot:hover {
-            transform: scale(1.2);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
+            left: var(--x);
+            top: var(--y);
+            width: var(--marker-size);
+            height: var(--marker-size);
             transform: translate(-50%, -50%);
-            background: transparent;
+            display: grid;
+            place-items: center;
             padding: 0;
-            border-radius: 0;
-            z-index: 999;
-            max-width: 80%;
+            color: #fff7e7;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(13px, 1.1vw, 18px);
+            line-height: 1;
+            border: 1px solid rgba(255, 238, 191, 0.9);
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 35% 30%, rgba(255, 223, 137, 0.95), rgba(179, 93, 31, 0.94) 46%, rgba(85, 35, 15, 0.98) 100%);
+            box-shadow:
+                0 2px 8px rgba(37, 16, 5, 0.65),
+                0 0 0 5px rgba(215, 156, 61, 0.18),
+                0 0 20px rgba(241, 185, 74, 0.36);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
         }
 
-        .modal img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .close-btn {
+        .hotspot::before {
+            content: "";
             position: absolute;
-            right: 0;
-            top: 0;
-            width: 80px;
-            height: 80px;
-            background: transparent;
-            cursor: pointer;
-            z-index: 1000;
+            inset: -10px;
+            border: 1px solid rgba(235, 181, 79, 0.45);
+            border-radius: 50%;
+            animation: marker-pulse 2.6s ease-out infinite;
         }
 
-        .music-control {
+        .hotspot::after {
+            content: attr(data-title);
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 12px);
+            transform: translate(-50%, 4px);
+            width: max-content;
+            max-width: 220px;
+            padding: 7px 11px;
+            color: #fff7e8;
+            font-family: "STKaiti", "KaiTi", serif;
+            font-size: 15px;
+            line-height: 1.2;
+            letter-spacing: 0.04em;
+            text-align: center;
+            white-space: nowrap;
+            border: 1px solid rgba(230, 180, 92, 0.55);
+            border-radius: 999px;
+            background: rgba(31, 17, 9, 0.9);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.36);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .hotspot:hover,
+        .hotspot:focus-visible {
+            z-index: 6;
+            transform: translate(-50%, -50%) scale(1.12);
+            filter: brightness(1.12);
+            box-shadow:
+                0 4px 12px rgba(37, 16, 5, 0.72),
+                0 0 0 6px rgba(239, 185, 76, 0.26),
+                0 0 28px rgba(255, 202, 93, 0.58);
+            outline: none;
+        }
+
+        .hotspot:hover::after,
+        .hotspot:focus-visible::after {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        @keyframes marker-pulse {
+            0%, 30% { opacity: 0.7; transform: scale(0.82); }
+            72%, 100% { opacity: 0; transform: scale(1.5); }
+        }
+
+        .narration {
             position: fixed;
-            right: 20px;
-            top: 20px;
-            z-index: 1000;
-            color: white;
+            z-index: 12;
+            left: clamp(12px, 3.4vw, 64px);
+            top: 50%;
+            width: min(46vw, 76vh, 760px);
+            aspect-ratio: 1;
+            transform: translateY(-50%) translateX(-18px);
+            opacity: 0;
+            pointer-events: none;
+            filter: drop-shadow(0 12px 25px rgba(53, 29, 11, 0.2));
+            transition: opacity 0.6s ease, transform 0.75s cubic-bezier(0.2, 0.7, 0.2, 1);
+        }
+
+        .narration.is-visible {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        body.is-explore .narration {
+            opacity: 0;
+        }
+
+        .narration img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .hud {
+            position: fixed;
+            z-index: 24;
+            inset: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.55s ease 1.65s;
+        }
+
+        body.is-started .hud {
+            opacity: 1;
+        }
+
+        .site-mark,
+        .top-actions,
+        .timeline-controls,
+        .chapter-status {
+            pointer-events: auto;
+        }
+
+        .site-mark {
+            position: absolute;
+            top: max(16px, calc(env(safe-area-inset-top) + 9px));
+            left: max(18px, calc(env(safe-area-inset-left) + 18px));
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 246, 223, 0.92);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.72);
+            letter-spacing: 0.15em;
+        }
+
+        .site-mark .seal {
+            display: grid;
+            place-items: center;
+            width: 31px;
+            height: 31px;
+            color: #f5dfac;
+            font-size: 18px;
+            letter-spacing: 0;
+            border: 1px solid rgba(245, 223, 172, 0.74);
+            background: rgba(112, 35, 24, 0.86);
+        }
+
+        .site-mark strong {
+            font-size: clamp(14px, 1.25vw, 19px);
+            font-weight: 500;
+        }
+
+        .top-actions {
+            position: absolute;
+            top: max(15px, calc(env(safe-area-inset-top) + 8px));
+            right: max(18px, calc(env(safe-area-inset-right) + 18px));
+            display: flex;
+            gap: 8px;
+        }
+
+        .hud-button {
+            min-height: 38px;
+            padding: 0 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            color: #fff4d8;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(225, 178, 91, 0.48);
+            border-radius: 999px;
+            background: rgba(27, 15, 8, 0.78);
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.22);
+            backdrop-filter: blur(8px);
             cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .hud-button:hover,
+        .hud-button:focus-visible {
+            background: rgba(91, 43, 18, 0.88);
+            border-color: rgba(244, 201, 113, 0.82);
+            outline: none;
+            transform: translateY(-1px);
+        }
+
+        .hud-button .icon {
+            min-width: 1.15em;
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        .chapter-status {
+            position: absolute;
+            left: 50%;
+            bottom: max(88px, calc(env(safe-area-inset-bottom) + 78px));
+            transform: translateX(-50%);
+            width: min(78vw, 630px);
+            text-align: center;
+            color: #fff2d2;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+        }
+
+        .chapter-status .eyebrow {
+            display: block;
+            margin-bottom: 4px;
+            color: rgba(248, 208, 127, 0.88);
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+        }
+
+        .chapter-status strong {
+            display: block;
+            overflow: hidden;
+            font-size: clamp(16px, 1.6vw, 23px);
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .timeline-controls {
+            position: absolute;
+            left: 50%;
+            bottom: max(20px, calc(env(safe-area-inset-bottom) + 12px));
+            transform: translateX(-50%);
+            width: min(86vw, 780px);
+            padding: 10px 13px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(220, 168, 78, 0.38);
+            border-radius: 18px;
+            background: rgba(22, 12, 7, 0.76);
+            box-shadow: 0 10px 38px rgba(0, 0, 0, 0.38);
+            backdrop-filter: blur(10px);
+        }
+
+        .control-cluster {
+            display: flex;
+            gap: 7px;
+        }
+
+        .round-button {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            color: #fff2d3;
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            border: 1px solid rgba(220, 168, 78, 0.42);
+            border-radius: 50%;
+            background: rgba(102, 51, 20, 0.46);
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .round-button:hover,
+        .round-button:focus-visible {
+            background: rgba(157, 84, 31, 0.72);
+            outline: none;
+            transform: scale(1.05);
+        }
+
+        .progress-wrap {
+            position: relative;
+            height: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-wrap::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 2px;
+            transform: translateY(-50%);
+            background: linear-gradient(90deg, rgba(216, 161, 67, 0.92) var(--progress, 0%), rgba(255, 244, 217, 0.28) var(--progress, 0%));
+        }
+
+        .timeline-range {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 30px;
+            margin: 0;
+            appearance: none;
+            background: transparent;
+            cursor: ew-resize;
+        }
+
+        .timeline-range::-webkit-slider-runnable-track {
+            height: 2px;
+            background: transparent;
+        }
+
+        .timeline-range::-webkit-slider-thumb {
+            width: 16px;
+            height: 16px;
+            margin-top: -7px;
+            appearance: none;
+            border: 2px solid #fff1ce;
+            border-radius: 50%;
+            background: var(--cinnabar);
+            box-shadow: 0 0 0 4px rgba(216, 161, 67, 0.2);
+        }
+
+        .timeline-range::-moz-range-track {
+            height: 2px;
+            background: transparent;
+        }
+
+        .timeline-range::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border: 2px solid #fff1ce;
+            border-radius: 50%;
+            background: var(--cinnabar);
+            box-shadow: 0 0 0 4px rgba(216, 161, 67, 0.2);
+        }
+
+        .position-readout {
+            min-width: 52px;
+            color: rgba(255, 236, 197, 0.78);
+            font-family: Georgia, serif;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .opening {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            display: grid;
+            place-items: center;
+            padding: 28px;
+            color: #f7e8c8;
+            text-align: center;
+            background:
+                radial-gradient(circle at 50% 44%, rgba(109, 66, 32, 0.26), transparent 33%),
+                linear-gradient(135deg, rgba(54, 30, 14, 0.28), transparent 45%),
+                #100a06;
+            transition: opacity 0.7s ease, visibility 0.7s ease;
+        }
+
+        .opening::before {
+            content: "";
+            position: absolute;
+            inset: 18px;
+            border: 1px solid rgba(201, 150, 67, 0.2);
+            pointer-events: none;
+        }
+
+        .opening.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .opening-content {
+            position: relative;
+            width: min(680px, 90vw);
+        }
+
+        .opening-seal {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 24px;
+            display: grid;
+            place-items: center;
+            color: #f4dfb3;
+            font-size: 31px;
+            border: 1px solid rgba(244, 223, 179, 0.74);
+            background: rgba(137, 45, 30, 0.76);
+            box-shadow: 0 0 34px rgba(180, 95, 39, 0.22);
+        }
+
+        .opening-kicker {
+            margin: 0 0 13px;
+            color: rgba(222, 176, 96, 0.92);
+            font-family: Georgia, serif;
+            font-size: 12px;
+            letter-spacing: 0.32em;
+        }
+
+        .opening h1 {
+            margin: 0;
+            font-size: clamp(38px, 7vw, 74px);
+            font-weight: 400;
+            line-height: 1.08;
+            letter-spacing: 0.16em;
+            text-shadow: 0 7px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .opening .subtitle {
+            margin: 20px auto 30px;
+            color: rgba(242, 220, 180, 0.76);
+            font-size: clamp(15px, 1.7vw, 19px);
+            line-height: 1.8;
+            letter-spacing: 0.08em;
+        }
+
+        .open-scroll {
+            min-width: 176px;
+            min-height: 50px;
+            padding: 0 26px;
+            color: #fff4d8;
+            font-size: 17px;
+            letter-spacing: 0.12em;
+            border: 1px solid rgba(238, 196, 114, 0.72);
+            border-radius: 2px;
+            background: linear-gradient(180deg, rgba(143, 68, 26, 0.84), rgba(96, 39, 19, 0.92));
+            box-shadow: 0 11px 32px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 235, 190, 0.12);
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+        }
+
+        .open-scroll:hover:not(:disabled),
+        .open-scroll:focus-visible:not(:disabled) {
+            filter: brightness(1.12);
+            outline: 2px solid rgba(243, 202, 122, 0.4);
+            outline-offset: 4px;
+            transform: translateY(-2px);
+        }
+
+        .open-scroll:disabled {
+            opacity: 0.56;
+            cursor: wait;
+        }
+
+        .opening-hint {
+            margin: 16px 0 0;
+            color: rgba(242, 220, 180, 0.54);
+            font-family: system-ui, sans-serif;
+            font-size: 12px;
+            letter-spacing: 0.04em;
         }
 
         .rotate-tip {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            color: white;
+            inset: 0;
+            z-index: 80;
+            place-items: center;
+            padding: 32px;
+            color: #f7e6c2;
             text-align: center;
-            padding-top: 30%;
-            z-index: 9999;
+            background: rgba(14, 9, 6, 0.96);
         }
 
-        /* 新增样式 */
-        .loading-screen {
+        .rotate-tip strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 26px;
+            font-weight: 400;
+            letter-spacing: 0.12em;
+        }
+
+        .rotate-tip span {
+            color: rgba(247, 230, 194, 0.68);
+            font-family: system-ui, sans-serif;
+            font-size: 14px;
+        }
+
+        .toast {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            color: white;
-            transition: opacity 1s ease;
-        }
-
-        .loading-text {
-            font-size: 24px;
-            margin-top: 20px;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .cinematic-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 990;
-        }
-
-        .cinematic-bar {
-            position: absolute;
-            width: 100%;
-            height: 10%;
-            background: #000;
-            transition: height 1.5s ease;
-            will-change: height;
-        }
-
-        .cinematic-bar.top {
-            top: 0;
-        }
-
-        .cinematic-bar.bottom {
-            bottom: 0;
-        }
-
-        .scroll-controls {
-            position: fixed;
-            bottom: 20px;
+            z-index: 46;
             left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px;
-            border-radius: 50px;
-            display: flex;
-            gap: 10px;
-            transition: opacity 0.5s ease;
-            will-change: opacity;
-        }
-
-        .scroll-controls button {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background 0.3s;
-        }
-
-        .scroll-controls button:hover {
-            background: rgba(255, 255, 255, 0.4);
-        }
-
-        .intro-image {
-            position: absolute;
-            max-width: 400px;
-            max-height: 300px;
+            top: 14%;
+            transform: translate(-50%, -10px);
+            max-width: min(86vw, 520px);
+            padding: 10px 16px;
+            color: #fff0cf;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            text-align: center;
+            border: 1px solid rgba(226, 175, 87, 0.5);
+            border-radius: 999px;
+            background: rgba(35, 18, 9, 0.9);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.32);
             opacity: 0;
-            transition: opacity 1s ease;
-            border-radius: 5px;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-            z-index: 100;
             pointer-events: none;
-            will-change: opacity;
-            transform: translateZ(0);
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
-        /* 新增朦胧效果覆盖层 */
-        .dreamy-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .toast.is-visible {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        .detail-dialog {
+            width: auto;
+            max-width: none;
+            max-height: none;
+            margin: auto;
+            padding: 0;
+            overflow: visible;
+            color: var(--ink);
+            border: 0;
+            border-radius: clamp(8px, 1.6vw, 24px);
+            background: transparent;
+            box-shadow: 0 28px 90px rgba(0, 0, 0, 0.62);
+        }
+
+        .detail-dialog::backdrop {
+            background: rgba(12, 8, 5, 0.78);
+            backdrop-filter: blur(7px) saturate(0.7);
+        }
+
+        .detail-shell {
+            position: relative;
+            width: min(92vw, calc(84vh * 1.5472), 1320px);
+            aspect-ratio: 1934 / 1250;
+            overflow: hidden;
+            border-radius: clamp(8px, 1.6vw, 24px);
+            background: #ead7b4;
+        }
+
+        .detail-image,
+        .detail-background {
+            display: block;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+        }
+
+        .detail-composite {
+            position: absolute;
+            inset: 0;
+            display: none;
+        }
+
+        .detail-shell.is-composite .detail-image {
+            display: none;
+        }
+
+        .detail-shell.is-composite .detail-composite {
+            display: block;
+        }
+
+        .detail-text-scroll {
+            position: absolute;
+            z-index: 2;
+            inset: 8.4% 0 2.2%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scrollbar-color: rgba(140, 78, 31, 0.68) rgba(232, 207, 164, 0.38);
+            scrollbar-width: thin;
+        }
+
+        .detail-text-scroll img {
+            display: block;
+            width: 100%;
+            height: auto;
             pointer-events: none;
-            z-index: 95;
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            transition: opacity 1.5s ease;
-            will-change: opacity;
         }
 
-        /* 新增弹出图片样式 */
-        .popup-image {
-            position: fixed;
-            max-width: 900px; /* 增大最大宽度 */
-            max-height: 700px; /* 增大最大高度 */
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.8) translateZ(0); /* 居中显示并使用硬件加速 */
-            z-index: 996; /* 高于朦胧层 */
-            pointer-events: none;
-            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            will-change: opacity, transform; /* 提示浏览器这些属性会变化 */
-            -webkit-transform: translate(-50%, -50%) scale(0.8) translateZ(0);
-            top: 50%;
-            left: 25%;
-            width: 800px;
+        .detail-close {
+            position: absolute;
+            z-index: 6;
+            top: 0.4%;
+            right: 0.2%;
+            width: clamp(50px, 6.4vw, 86px);
+            height: clamp(42px, 6.2vw, 78px);
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
         }
 
-        .popup-image.active {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1) translateZ(0);
-            -webkit-transform: translate(-50%, -50%) scale(1) translateZ(0);
+        .detail-close:focus-visible {
+            outline: 3px solid rgba(255, 248, 225, 0.95);
+            outline-offset: -7px;
         }
 
-        /* 为全屏状态添加样式 */
-        .fullscreen-mode .cinematic-bar {
-            height: 0 !important;
+        @media (max-width: 760px) {
+            .site-mark strong,
+            .hud-button .label,
+            .position-readout {
+                display: none;
+            }
+
+            .hud-button {
+                width: 40px;
+                padding: 0;
+            }
+
+            .timeline-controls {
+                width: min(94vw, 760px);
+                grid-template-columns: auto 1fr;
+            }
+
+            .position-readout {
+                min-width: 0;
+            }
+
+            .chapter-status {
+                bottom: max(78px, calc(env(safe-area-inset-bottom) + 68px));
+            }
+
+            .narration {
+                left: 8px;
+                width: min(50vw, 82vh);
+            }
+
+            .hotspot::after {
+                display: none;
+            }
         }
 
-        .fullscreen-mode .dreamy-overlay {
-            opacity: 0;
-        }
-
-        .fullscreen-mode .popup-image {
-            opacity: 0;
-        }
-
-        @media screen and (orientation: portrait) {
+        @media (orientation: portrait) and (max-width: 900px) {
             .rotate-tip {
-                display: block;
+                display: grid;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-<!-- 新增加载动画 -->
-<div class="loading-screen">
-    <div class="spinner"></div>
-    <div class="loading-text">正在加载...</div>
-</div>
+    <main class="app" aria-label="基督教传入中国历史时间轴">
+        <section id="stage" class="stage" aria-label="横向历史长卷；可左右拖动、滚轮或方向键浏览">
+            <div id="scroll-mask" class="scroll-mask">
+                <div id="timeline" class="timeline">
+                    <div id="hotspot-layer" class="hotspot-layer" aria-label="历史事件热点"></div>
+                </div>
+            </div>
+        </section>
 
-<!-- 新增电影感蒙版 -->
-<div class="cinematic-overlay">
-    <div class="cinematic-bar top"></div>
-    <div class="cinematic-bar bottom"></div>
-</div>
+        <div class="reveal-edge left" aria-hidden="true"></div>
+        <div class="reveal-edge right" aria-hidden="true"></div>
+        <div class="cinematic-bars" aria-hidden="true"></div>
 
-<!-- 新增朦胧效果覆盖层 -->
-<div class="dreamy-overlay"></div>
+        <aside id="narration" class="narration" aria-live="polite">
+            <img id="narration-image" src="" alt="">
+        </aside>
 
-<div class="rotate-tip">请将手机横屏观看</div>
-<div class="music-control"><i class="fas fa-volume-up"></i></div>
-<div class="container">
-    <!-- 热点示例 - 需要根据实际位置调整 -->
-    <div class="hotspot" style="left: 700px; top: 300px;" data-img="images/layer3/1丝绸之路_画板 1.png"></div>
-    <div class="hotspot" style="left: 1950px; top: 220px;" data-img="images/layer3/2最古铁十字架_画板 1.png"></div>
-    <div class="hotspot" style="left: 3000px; top: 350px;" data-img="images/layer3/3景教_画板 1.png"></div>
-    <div class="hotspot" style="left: 4120px; top: 300px;" data-img="images/layer3/4流行中国碑_画板 1.png"></div>
-    <div class="hotspot" style="left: 5100px; top: 500px;" data-img="images/layer3/5聂斯多略派教徒墓碑_画板 1.png"></div>
-    <div class="hotspot" style="left: 5980px; top: 350px;" data-img="images/layer3/6也里可温教_画板 1.png"></div>
-    <div class="hotspot" style="left: 6700px; top: 500px;" data-img="images/layer3/7孟高维诺译本_画板 1.png"></div>
-    <div class="hotspot" style="left: 7350px; top: 30px;" data-img="images/layer3/9闭关锁国_画板 1.png"></div>
-    <div class="hotspot" style="left: 8300px; top: 445px;" data-img="images/layer3/8祖传天主十诫_画板 1.png"></div>
-    <div class="hotspot" style="left: 8350px; top: 350px;" data-img="images/layer3/10西学东渐_画板 1.png"></div>
-    <div class="hotspot" style="left: 8450px; top: 435px;" data-img="images/layer3/11徐光启与几何原本_画板 1.png"></div>
-    <div class="hotspot" style="left: 9300px; top: 430px;" data-img="images/layer3/12康熙与十字架（文字）_画板 1_画板 1.png"></div>
-    <div class="hotspot" style="left: 10400px; top: 350px;" data-img="images/layer3/13礼仪之争_画板 1.png"></div>
-    <div class="hotspot" style="left: 11010px; top: 690px;" data-img="images/layer3/14百年禁教_画板 1.png"></div>
-    <div class="hotspot" style="left: 11800px; top: 350px;" data-img="images/layer3/15新教第一人_画板 1.png"></div>
-    <div class="hotspot" style="left: 11700px; top: 600px;" data-img="images/layer3/16神天圣书_画板 1.png"></div>
-    <div class="hotspot" style="left: 12270px; top: 420px;" data-img="images/layer3/17中国第一位新教徒_画板 1.png"></div>
-    <div class="hotspot" style="left: 12800px; top: 300px;" data-img="images/layer3/18大规模中文译经（滑动文字）_画板 1_画板 1_画板 1.png"></div>
-    <div class="hotspot" style="left: 13500px; top: 170px;" data-img="images/layer3/19太平天国运动_画板 1.png"></div>
-    <div class="hotspot" style="left: 14600px; top: 150px;" data-img="images/layer3/21义和团运动_画板 1.png"></div>
-    <div class="hotspot" style="left: 15300px; top: 200px;" data-img="images/layer3/22辛亥革命_画板 1.png"></div>
-    <div class="hotspot" style="left: 16300px; top: 200px;" data-img="images/layer3/23五四运动_画板 1.png"></div>
-    <div class="hotspot" style="left: 15500px; top: 350px;" data-img="images/layer3/24官话和合本_画板 1.png"></div>
+        <div class="hud">
+            <div class="site-mark" aria-hidden="true">
+                <span class="seal">和</span>
+                <strong>千年薪火 · 百年和合</strong>
+            </div>
 
-</div>
+            <div class="top-actions">
+                <button id="mode-button" class="hud-button" type="button" aria-label="切换到自由探索">
+                    <span class="icon" aria-hidden="true">⌁</span>
+                    <span class="label">自由探索</span>
+                </button>
+                <button id="music-button" class="hud-button" type="button" aria-label="暂停背景音乐" aria-pressed="true">
+                    <span id="music-icon" class="icon" aria-hidden="true">♫</span>
+                    <span id="music-label" class="label">音乐开启</span>
+                </button>
+            </div>
 
-<div class="modal">
-    <div class="close-btn"></div>
-    <img src="" alt="详情图片">
-</div>
+            <div class="chapter-status" aria-live="polite">
+                <span id="mode-eyebrow" class="eyebrow">AUTO NARRATIVE</span>
+                <strong id="chapter-label">丝绸之路</strong>
+            </div>
 
-<!-- 新增滚动控制按钮 -->
-<div class="scroll-controls">
-    <button id="pause-btn"><i class="fas fa-pause"></i></button>
-    <button id="play-btn"><i class="fas fa-play"></i></button>
-    <button id="restart-btn"><i class="fas fa-redo"></i></button>
-</div>
+            <div class="timeline-controls" aria-label="时间轴播放控制">
+                <div class="control-cluster">
+                    <button id="play-button" class="round-button" type="button" aria-label="暂停自动导览">Ⅱ</button>
+                    <button id="restart-button" class="round-button" type="button" aria-label="回到时间轴起点">↶</button>
+                </div>
+                <div id="progress-wrap" class="progress-wrap">
+                    <label class="sr-only" for="timeline-range">时间轴位置</label>
+                    <input id="timeline-range" class="timeline-range" type="range" min="0" max="1000" value="0" step="1">
+                </div>
+                <output id="position-readout" class="position-readout" for="timeline-range">0%</output>
+            </div>
+        </div>
 
-<audio id="bgm" loop>
-    <source src="audio/bgm.mp3" type="audio/mpeg"> <!-- 替换背景音乐 -->
-</audio>
+        <section id="opening" class="opening" aria-labelledby="opening-title">
+            <div class="opening-content">
+                <div class="opening-seal" aria-hidden="true">和</div>
+                <p class="opening-kicker">A JOURNEY THROUGH HISTORY</p>
+                <h1 id="opening-title">千年薪火<br>百年和合</h1>
+                <p class="subtitle">沿一轴古卷，回望基督教传入中国<br>与中文圣经翻译的千年足迹</p>
+                <button id="open-scroll" class="open-scroll" type="button" disabled>画卷加载中…</button>
+                <p class="opening-hint">启卷后将播放背景音乐 · 可随时暂停或自由探索</p>
+            </div>
+        </section>
 
-<script>
-    // 音乐控制
-    const musicControl = document.querySelector('.music-control');
-    const audio = document.getElementById('bgm');
-    let isMuted = false;
+        <div class="rotate-tip" role="status">
+            <div>
+                <strong>请横屏启卷</strong>
+                <span>横向观看可获得完整的时间轴体验</span>
+            </div>
+        </div>
 
-    musicControl.addEventListener('click', () => {
-        isMuted = !isMuted;
-        audio.muted = isMuted;
-        musicControl.innerHTML = isMuted ?
-            '<i class="fas fa-volume-mute"></i>' :
-            '<i class="fas fa-volume-up"></i>';
-    });
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-    // 弹窗控制
-    const hotspots = document.querySelectorAll('.hotspot');
-    const modal = document.querySelector('.modal');
-    const closeBtn = document.querySelector('.close-btn');
+        <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-heading">
+            <h2 id="detail-heading" class="sr-only">历史事件详情</h2>
+            <div id="detail-shell" class="detail-shell">
+                <img id="detail-image" class="detail-image" src="" alt="">
+                <div class="detail-composite">
+                    <img id="detail-background" class="detail-background" src="" alt="">
+                    <div id="detail-text-scroll" class="detail-text-scroll" tabindex="0" aria-label="上下滚动阅读完整介绍">
+                        <img id="detail-text" src="" alt="">
+                    </div>
+                </div>
+                <button id="detail-close" class="detail-close" type="button" aria-label="关闭详情">
+                    <span class="sr-only">关闭</span>
+                </button>
+            </div>
+        </dialog>
 
-    hotspots.forEach(hotspot => {
-        hotspot.addEventListener('click', (e) => {
-            const imgUrl = e.target.dataset.img;
-            modal.querySelector('img').src = imgUrl;
-            modal.style.display = 'block';
-            pauseScrolling(); // 点击热点时暂停滚动
-        });
-    });
+        <audio id="bgm" loop preload="metadata">
+            <source src="audio/bgm.mp3" type="audio/mpeg">
+        </audio>
+    </main>
 
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
+    <script>
+        (() => {
+            "use strict";
 
-    // 自动播放音乐（需要用户交互后）
-    document.addEventListener('click', function initAudio() {
-        audio.play();
-        document.removeEventListener('click', initAudio);
-    });
+            const SOURCE_WIDTH = 17060;
+            const SOURCE_HEIGHT = 806;
+            const NARRATIVE_BACKGROUND = "images/layer1/background_layer1.png";
+            const EXPLORE_BACKGROUND = "images/layer2/background_layer2.jpg";
+            const AUTO_SPEED = 180;
 
-    // 移动端横屏检测
-    window.addEventListener('orientationchange', () => {
-        if (window.orientation === 90 || window.orientation === -90) {
-            document.querySelector('.rotate-tip').style.display = 'none';
-        }
-    });
+            const scenes = [
+                { title: "丝绸之路", start: 0, end: 900, image: "images/layer1/copywriting/1.丝绸之路_画板 1.png" },
+                { title: "最古铁十字架", start: 900, end: 2050, image: "images/layer1/copywriting/2.最古铁十字架_画板 1.png" },
+                { title: "景教入华", start: 2050, end: 3250, image: "images/layer1/copywriting/3.景教入华_画板 1.png" },
+                { title: "大秦景教", start: 3250, end: 4250, image: "images/layer1/copywriting/4. 大秦景教_画板 1.png" },
+                { title: "退居边疆", start: 4250, end: 5050, image: "images/layer1/copywriting/5.退居边疆_画板 1.png" },
+                { title: "景教复苏", start: 5050, end: 5850, image: "images/layer1/copywriting/6.景教复苏_画板 1.png" },
+                { title: "天主教入华", start: 5850, end: 6550, image: "images/layer1/copywriting/7.天主教入华_画板 1.png" },
+                { title: "闭关锁国", start: 6550, end: 7350, image: "images/layer1/copywriting/8.闭关锁国_画板 1.png" },
+                { title: "泰西儒士", start: 7350, end: 7800, image: "images/layer1/copywriting/9.泰西儒士_画板 1.png" },
+                { title: "西学东渐", start: 7800, end: 8500, image: "images/layer1/copywriting/10.西学东渐_画板 1.png" },
+                { title: "帝师教士", start: 8500, end: 9400, image: "images/layer1/copywriting/11.帝师教士_画板 1.png" },
+                { title: "礼仪之争", start: 9400, end: 10350, image: "images/layer1/copywriting/12.利益之争_画板 1.png" },
+                { title: "百年禁教", start: 10350, end: 11050, image: "images/layer1/copywriting/13.百年禁教_画板 1.png" },
+                { title: "新教入华", start: 11050, end: 12000, image: "images/layer1/copywriting/14.新教入华_画板 1.png" },
+                { title: "被迫开放", start: 12000, end: 12700, image: "images/layer1/copywriting/15.被迫开放_画板 1.png" },
+                { title: "太平天国运动", start: 12700, end: 13600, image: "images/layer1/copywriting/16.太平天国运动_画板 1.png" },
+                { title: "帝国覆灭", start: 13600, end: 14400, image: "images/layer1/copywriting/17.帝国覆灭_画板 1.png" },
+                { title: "和合本面世", start: 14400, end: 15000, image: "images/layer1/copywriting/19.和合本面世_画板 1.png" },
+                { title: "新文化运动", start: 15000, end: SOURCE_WIDTH, image: "images/layer1/copywriting/18.新文化运动_画板 1.png" }
+            ];
 
-    // 新增功能：加载动画、电影感蒙版和卷轴滚动
-    const loadingScreen = document.querySelector('.loading-screen');
-    const container = document.querySelector('.container');
-    const topBar = document.querySelector('.cinematic-bar.top');
-    const bottomBar = document.querySelector('.cinematic-bar.bottom');
-    const pauseBtn = document.getElementById('pause-btn');
-    const playBtn = document.getElementById('play-btn');
-    const restartBtn = document.getElementById('restart-btn');
-    const dreamyOverlay = document.querySelector('.dreamy-overlay');
-    const body = document.body;
-    
-    // 创建完整的性能监控器
-    const performanceMonitor = {
-        frameCount: 0,
-        lastTime: performance.now(),
-        fps: 60,
-        lowPerformanceMode: false,
-        
-        update() {
-            this.frameCount++;
-            const now = performance.now();
-            const elapsed = now - this.lastTime;
-            
-            if (elapsed >= 1000) {
-                this.fps = this.frameCount / (elapsed / 1000);
-                this.frameCount = 0;
-                this.lastTime = now;
-                
-                // 检测低性能，并切换模式
-                if (this.fps < 30 && !this.lowPerformanceMode) {
-                    this.lowPerformanceMode = true;
-                    this.enableLowPerformanceMode();
-                } else if (this.fps > 40 && this.lowPerformanceMode) {
-                    this.lowPerformanceMode = false;
-                    this.disableLowPerformanceMode();
-                }
+            const events = [
+                { id: 1, title: "丝绸之路", x: 3.7, y: 44, image: "images/layer3/1丝绸之路_画板 1.png" },
+                { id: 2, title: "最古铁十字架", x: 11.9, y: 26, image: "images/layer3/2最古铁十字架_画板 1.png" },
+                { id: 3, title: "景教入华", x: 18.0, y: 54, image: "images/layer3/3景教_画板 1.png" },
+                { id: 4, title: "大秦景教流行中国碑", x: 24.6, y: 29, image: "images/layer3/4流行中国碑_画板 1.png" },
+                { id: 5, title: "聂斯多略派教徒墓碑", x: 30.3, y: 65, image: "images/layer3/5聂斯多略派教徒墓碑_画板 1.png" },
+                { id: 6, title: "也里可温教", x: 36.3, y: 45, image: "images/layer3/6也里可温教_画板 1.png" },
+                { id: 7, title: "孟高维诺译本", x: 40.7, y: 64, image: "images/layer3/7孟高维诺译本_画板 1.png" },
+                { id: 8, title: "祖传天主十诫", x: 50.5, y: 54, image: "images/layer3/8祖传天主十诫_画板 1.png" },
+                { id: 9, title: "闭关锁国", x: 44.4, y: 10, image: "images/layer3/9闭关锁国_画板 1.png" },
+                { id: 10, title: "西学东渐", x: 50.7, y: 43, image: "images/layer3/10西学东渐_画板 1.png" },
+                { id: 11, title: "徐光启与《几何原本》", x: 51.4, y: 52, image: "images/layer3/11徐光启与几何原本_画板 1.png" },
+                { id: 12, title: "康熙与《十架颂》", x: 56.3, y: 58, background: "images/layer3/12康熙与十字架（背景）_画板 1.png", text: "images/layer3/12康熙与十字架（文字）_画板 1_画板 1.png" },
+                { id: 13, title: "礼仪之争", x: 63.0, y: 29, image: "images/layer3/13礼仪之争_画板 1.png" },
+                { id: 14, title: "百年禁教", x: 66.6, y: 84, image: "images/layer3/14百年禁教_画板 1.png" },
+                { id: 15, title: "马礼逊：新教第一人", x: 71.8, y: 37, image: "images/layer3/15新教第一人_画板 1.png" },
+                { id: 16, title: "《神天圣书》", x: 70.9, y: 74, image: "images/layer3/16神天圣书_画板 1.png" },
+                { id: 17, title: "中国第一位新教徒", x: 74.3, y: 54, image: "images/layer3/17中国第一位新教徒_画板 1.png" },
+                { id: 18, title: "大规模中文译经", x: 77.4, y: 29, background: "images/layer3/18大规模中文译经（背景）_画板 1.png", text: "images/layer3/18大规模中文译经（滑动文字）_画板 1_画板 1_画板 1.png" },
+                { id: 19, title: "太平天国运动", x: 81.4, y: 24, image: "images/layer3/19太平天国运动_画板 1.png" },
+                { id: 20, title: "《新旧遗诏圣书》", x: 83.3, y: 34, image: "images/layer3/20新旧遗诏圣书_画板 1.png" },
+                { id: 21, title: "义和团运动", x: 88.4, y: 15, image: "images/layer3/21义和团运动_画板 1.png" },
+                { id: 22, title: "辛亥革命", x: 92.4, y: 17, image: "images/layer3/22辛亥革命_画板 1.png" },
+                { id: 23, title: "五四运动", x: 95.1, y: 28, image: "images/layer3/23五四运动_画板 1.png" },
+                { id: 24, title: "官话和合本", x: 92.2, y: 67, image: "images/layer3/24官话和合本_画板 1.png" }
+            ];
+
+            const stage = document.getElementById("stage");
+            const timeline = document.getElementById("timeline");
+            const hotspotLayer = document.getElementById("hotspot-layer");
+            const narration = document.getElementById("narration");
+            const narrationImage = document.getElementById("narration-image");
+            const opening = document.getElementById("opening");
+            const openScrollButton = document.getElementById("open-scroll");
+            const playButton = document.getElementById("play-button");
+            const restartButton = document.getElementById("restart-button");
+            const modeButton = document.getElementById("mode-button");
+            const modeButtonLabel = modeButton.querySelector(".label");
+            const musicButton = document.getElementById("music-button");
+            const musicIcon = document.getElementById("music-icon");
+            const musicLabel = document.getElementById("music-label");
+            const timelineRange = document.getElementById("timeline-range");
+            const progressWrap = document.getElementById("progress-wrap");
+            const positionReadout = document.getElementById("position-readout");
+            const modeEyebrow = document.getElementById("mode-eyebrow");
+            const chapterLabel = document.getElementById("chapter-label");
+            const toast = document.getElementById("toast");
+            const audio = document.getElementById("bgm");
+            const detailDialog = document.getElementById("detail-dialog");
+            const detailHeading = document.getElementById("detail-heading");
+            const detailShell = document.getElementById("detail-shell");
+            const detailImage = document.getElementById("detail-image");
+            const detailBackground = document.getElementById("detail-background");
+            const detailText = document.getElementById("detail-text");
+            const detailTextScroll = document.getElementById("detail-text-scroll");
+            const detailClose = document.getElementById("detail-close");
+
+            let scale = 1;
+            let worldWidth = SOURCE_WIDTH;
+            let maxScroll = 0;
+            let scrollPosition = 0;
+            let mode = "tour";
+            let playing = false;
+            let started = false;
+            let activeSceneIndex = -1;
+            let lastFrameTime = performance.now();
+            let resumeAfterDialog = false;
+            let lastFocusedHotspot = null;
+            let toastTimer = 0;
+            let pointerId = null;
+            let pointerStartX = 0;
+            let pointerStartScroll = 0;
+            let pointerTravel = 0;
+
+            function clamp(value, min, max) {
+                return Math.min(Math.max(value, min), max);
             }
-        },
-        
-        enableLowPerformanceMode() {
-            console.log("启用低性能模式");
-            document.body.classList.add('low-performance-mode');
-        },
-        
-        disableLowPerformanceMode() {
-            console.log("禁用低性能模式");
-            document.body.classList.remove('low-performance-mode');
-        }
-    };
 
-    // 图片显示和消失配置
-    const introImages = [
-        {
-            src: "images/layer3/1丝绸之路_画板 1.png", 
-            showAtPosition: 600, 
-            hideAtPosition: 1200,
-            top: 100, 
-            left: 50
-        },
-        {
-            src: "images/layer3/2最古铁十字架_画板 1.png", 
-            showAtPosition: 1800, 
-            hideAtPosition: 2300,
-            top: 150, 
-            left: 50
-        },
-        {
-            src: "images/layer3/3景教_画板 1.png", 
-            showAtPosition: 2900, 
-            hideAtPosition: 3400,
-            top: 120, 
-            left: 50
-        },
-        {
-            src: "images/layer3/4流行中国碑_画板 1.png", 
-            showAtPosition: 4000, 
-            hideAtPosition: 4500,
-            top: 100, 
-            left: 50
-        },
-        {
-            src: "images/layer3/5聂斯多略派教徒墓碑_画板 1.png", 
-            showAtPosition: 5000, 
-            hideAtPosition: 5500,
-            top: 150, 
-            left: 50
-        },
-        {
-            src: "images/layer3/6也里可温教_画板 1.png", 
-            showAtPosition: 5900, 
-            hideAtPosition: 6400,
-            top: 120, 
-            left: 50
-        },
-        {
-            src: "images/layer3/7孟高维诺译本_画板 1.png", 
-            showAtPosition: 6600, 
-            hideAtPosition: 7100,
-            top: 100, 
-            left: 50
-        },
-        {
-            src: "images/layer38祖传天主十诫_画板 1.png", 
-            showAtPosition: 7300, 
-            hideAtPosition: 7800,
-            top: 150, 
-            left: 50
-        },
-        {
-            src: "images/layer3/9闭关锁国_画板 1.png", 
-            showAtPosition: 8200, 
-            hideAtPosition: 8700,
-            top: 120, 
-            left: 50
-        },
-        {
-            src: "images/layer3/10西学东渐_画板 1.png", 
-            showAtPosition: 8700, 
-            hideAtPosition: 9200,
-            top: 100, 
-            left: 50
-        },
-        {
-            src: "images/layer3/11徐光启与几何原本_画板 1.png", 
-            showAtPosition: 9200, 
-            hideAtPosition: 9700,
-            top: 150, 
-            left: 50
-        },
-        {
-            src: "images/layer3/12康熙与十字架（文字）_画板 1_画板 1.png", 
-            showAtPosition: 9800, 
-            hideAtPosition: 10300,
-            top: 120, 
-            left: 50
-        },
-        {
-            src: "images/layer3/13礼仪之争_画板 1.png", 
-            showAtPosition: 10400, 
-            hideAtPosition: 10900,
-            top: 100, 
-            left: 50
-        },
-        {
-            src: "images/layer3/14百年禁教_画板 1.png", 
-            showAtPosition: 11000, 
-            hideAtPosition: 11500,
-            top: 150, 
-            left: 50
-        },
-        {
-            src: "images/layer3/15新教第一人_画板 1.png", 
-            showAtPosition: 11700, 
-            hideAtPosition: 12200,
-            top: 120, 
-            left: 50
-        },
-        {
-            src: "images/layer3/16神天圣书_画板 1.png", 
-            showAtPosition: 12300, 
-            hideAtPosition: 12800,
-            top: 100, 
-            left: 50
-        },
-        {
-            src: "images/layer3/17中国第一位新教徒_画板 1.png", 
-            showAtPosition: 12900, 
-            hideAtPosition: 13400,
-            top: 150, 
-            left: 50
-        },
-        {
-            src: "images/layer3/18大规模中文译经（滑动文字）_画板 1_画板 1_画板 1.png", 
-            showAtPosition: 13500, 
-            hideAtPosition: 14000,
-            top: 120, 
-            left: 50
-        },
-        {
-            src: "images/layer3/19太平天国运动_画板 1.png", 
-            showAtPosition: 14100, 
-            hideAtPosition: 14600,
-            top: 100, 
-            left: 50
-        },
-        {
-            src: "images/layer3/21义和团运动_画板 1.png", 
-            showAtPosition: 14700, 
-            hideAtPosition: 15200,
-            top: 150, 
-            left: 50
-        },
-        {
-            src: "images/layer3/22辛亥革命_画板 1.png", 
-            showAtPosition: 15300, 
-            hideAtPosition: 15800,
-            top: 120, 
-            left: 50
-        },
-        {
-            src: "images/layer3/23五四运动_画板 1.png", 
-            showAtPosition: 15900, 
-            hideAtPosition: 16400,
-            top: 100, 
-            left: 50
-        },
-        {
-            src: "images/layer3/24官话和合本_画板 1.png", 
-            showAtPosition: 16500, 
-            hideAtPosition: 17000,
-            top: 150, 
-            left: 50
-        }
-    ];
-
-    // 新增弹出图片配置
-    const popupImages = [
-        {
-            src: "images/layer1/copywriting/1.丝绸之路_画板 1.png", 
-            showAtPosition: 10, 
-            hideAtPosition: 800
-        },
-        {
-            src: "images/layer1/copywriting/2.最古铁十字架_画板 1.png", 
-            showAtPosition: 1000, 
-            hideAtPosition: 2000
-        },
-        {
-            src: "images/layer1/copywriting/3.景教入华_画板 1.png", 
-            showAtPosition: 2100, 
-            hideAtPosition: 3200
-        },
-        {
-            src: "images/layer1/copywriting/4. 大秦景教_画板 1.png", 
-            showAtPosition: 3300, 
-            hideAtPosition: 4200
-        },
-        {
-            src: "images/layer1/copywriting/5.退居边疆_画板 1.png", 
-            showAtPosition: 4300, 
-            hideAtPosition: 5000
-        },
-        {
-            src: "images/layer1/copywriting/6.景教复苏_画板 1.png", 
-            showAtPosition: 5100, 
-            hideAtPosition: 5800
-        },
-        {
-            src: "images/layer1/copywriting/7.天主教入华_画板 1.png", 
-            showAtPosition: 5900, 
-            hideAtPosition: 6500
-        },
-        {
-            src: "images/layer1/copywriting/8.闭关锁国_画板 1.png", 
-            showAtPosition: 6600, 
-            hideAtPosition: 7300
-        },
-        {
-            src: "images/layer1/copywriting/9.泰西儒士_画板 1.png", 
-            showAtPosition: 7400, 
-            hideAtPosition: 7700
-        },
-        {
-            src: "images/layer1/copywriting/10.西学东渐_画板 1.png", 
-            showAtPosition: 7800, 
-            hideAtPosition: 8400
-        },
-        {
-            src: "images/layer1/copywriting/11.帝师教士_画板 1.png", 
-            showAtPosition: 8500, 
-            hideAtPosition: 9300
-        },
-        {
-            src: "images/layer1/copywriting/12.利益之争_画板 1.png", 
-            showAtPosition: 9400, 
-            hideAtPosition: 10300
-        },
-        {
-            src: "images/layer1/copywriting/13.百年禁教_画板 1.png", 
-            showAtPosition: 10400, 
-            hideAtPosition: 10900
-        },
-        {
-            src: "images/layer1/copywriting/14.新教入华_画板 1.png", 
-            showAtPosition: 11100, 
-            hideAtPosition: 11900
-        },
-        {
-            src: "images/layer1/copywriting/15.被迫开放_画板 1.png", 
-            showAtPosition: 12000, 
-            hideAtPosition: 12600
-        },
-        {
-            src: "images/layer1/copywriting/16.太平天国运动_画板 1.png", 
-            showAtPosition: 12700, 
-            hideAtPosition: 13500
-        },
-        {
-            src: "images/layer1/copywriting/17.帝国覆灭_画板 1.png", 
-            showAtPosition: 13600, 
-            hideAtPosition: 14300
-        },
-        {
-            src: "images/layer1/copywriting/18.新文化运动_画板 1.png", 
-            showAtPosition: 15000, 
-            hideAtPosition: 16000
-        },
-        {
-            src: "images/layer1/copywriting/19.和合本面世_画板 1.png", 
-            showAtPosition: 14400, 
-            hideAtPosition: 14900
-        }
-    ];
-
-    // 采用更高效的预加载方法
-    function preloadImages() {
-        console.log("开始预加载图片...");
-        const loadPromises = [];
-        
-        // 收集所有需要预加载的图片
-        const imagesToPreload = [];
-        introImages.forEach(img => imagesToPreload.push(img.src));
-        popupImages.forEach(img => imagesToPreload.push(img.src));
-        
-        // 创建一个Promise来监控每个图片的加载
-        imagesToPreload.forEach(src => {
-            loadPromises.push(new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => resolve(src);
-                img.onerror = () => {
-                    console.error(`无法加载图片: ${src}`);
-                    resolve(src); // 即使出错也继续
-                };
-                img.src = src;
-            }));
-        });
-        
-        // 当所有图片加载完毕后，才继续
-        return Promise.all(loadPromises).then(() => {
-            console.log("所有图片预加载完成!");
-        });
-    }
-
-    // 创建介绍图片元素 - 优化DOM操作
-    function createIntroImages() {
-        const fragment = document.createDocumentFragment();
-        
-        introImages.forEach((imgConfig, index) => {
-            const imgElement = new Image();
-            imgElement.src = imgConfig.src;
-            imgElement.className = 'intro-image';
-            imgElement.style.top = imgConfig.top + 'px';
-            imgElement.style.left = imgConfig.left + 'px';
-            imgElement.loading = "eager"; // 使用原生懒加载
-            
-            fragment.appendChild(imgElement);
-            
-            // 保存元素引用
-            introImages[index].element = imgElement;
-        });
-        
-        container.appendChild(fragment);
-    }
-
-    // 创建弹出图片元素 - 优化DOM操作
-    function createPopupImages() {
-        const fragment = document.createDocumentFragment();
-        
-        popupImages.forEach((imgConfig, index) => {
-            const imgElement = new Image();
-            imgElement.src = imgConfig.src;
-            imgElement.className = 'popup-image';
-            imgElement.loading = "eager"; // 使用原生懒加载
-            
-            fragment.appendChild(imgElement);
-            
-            // 保存元素引用
-            popupImages[index].element = imgElement;
-        });
-        
-        document.body.appendChild(fragment);
-    }
-
-    // 控制卷轴滚动
-    let scrollPosition = 0;
-    let isScrolling = false;
-    let scrollSpeed = 3; // 每帧移动的像素数
-    const maxScroll = container.offsetWidth - window.innerWidth;
-    let lastFrameTime = 0; // 上一帧的时间戳
-    const targetFPS = 60; // 目标帧率
-    const frameDuration = 1000 / targetFPS; // 每帧理想持续时间 (ms)
-    
-    function startScrolling() {
-        if (isScrolling) return;
-        
-        isScrolling = true;
-        playBtn.style.display = 'none';
-        pauseBtn.style.display = 'inline-flex';
-        lastFrameTime = performance.now();
-        requestAnimationFrame(scrollAnimation);
-    }
-    
-    function pauseScrolling() {
-        isScrolling = false;
-        playBtn.style.display = 'inline-flex';
-        pauseBtn.style.display = 'none';
-    }
-    
-    function resetScrolling() {
-        scrollPosition = 0;
-        updateScrollPosition();
-        pauseScrolling();
-    }
-
-    // 优化的动画帧率控制
-    function scrollAnimation(timestamp) {
-        if (!isScrolling) return;
-        
-        // 更新性能监控
-        performanceMonitor.update();
-        
-        // 计算帧与帧之间的时间差
-        const elapsed = timestamp - lastFrameTime;
-        
-        // 基于实际帧率计算移动距离，确保匀速滚动
-        const pixelsToMove = (scrollSpeed * elapsed) / frameDuration;
-        
-        if (scrollPosition < maxScroll) {
-            scrollPosition += pixelsToMove;
-            if (scrollPosition > maxScroll) scrollPosition = maxScroll;
-            
-            // 高效更新位置
-            updateScrollPosition();
-            
-            // 仅在确实移动了的情况下更新图片
-            if (pixelsToMove > 0) {
-                updateVisibleImages();
+            function sourcePosition() {
+                return scale ? scrollPosition / scale : 0;
             }
-            
-            lastFrameTime = timestamp;
-            requestAnimationFrame(scrollAnimation);
-        } else {
-            pauseScrolling();
-            // 动画结束后，自动退出到全屏状态
-            exitToCinematics();
-        }
-    }
-    
-    // 更高效的位置更新
-    function updateScrollPosition() {
-        // 使用transform代替修改left属性，获得更好的性能
-        container.style.transform = `translateX(-${scrollPosition}px)`;
-    }
-    
-    // 更高效的图片可见性更新
-    const visibilityCache = new Map();
-    let activeSectionStart = 0;
-    let activeSectionEnd = 0;
-    const bufferDistance = 500; // 提前500像素加载图片
-    
-    function updateVisibleImages() {
-        // 计算当前可见区域范围（添加缓冲区）
-        const viewportStart = Math.max(0, scrollPosition - bufferDistance);
-        const viewportEnd = scrollPosition + window.innerWidth + bufferDistance;
-        
-        // 如果视口范围没有明显变化，跳过更新
-        if (Math.abs(viewportStart - activeSectionStart) < 100 && 
-            Math.abs(viewportEnd - activeSectionEnd) < 100) {
-            return;
-        }
-        
-        activeSectionStart = viewportStart;
-        activeSectionEnd = viewportEnd;
-        
-        // 仅处理当前视口附近的图片
-        updateImageVisibility(popupImages);
-    }
-    
-    function updateImageVisibility(images) {
-        const currentPosition = scrollPosition;
-        
-        images.forEach((imgConfig, index) => {
-            const imgElement = imgConfig.element;
-            const shouldBeVisible = currentPosition >= imgConfig.showAtPosition && 
-                                    currentPosition < imgConfig.hideAtPosition;
-            
-            // 检查缓存，避免不必要的DOM操作
-            const cachedState = visibilityCache.get(imgElement);
-            if (cachedState !== shouldBeVisible) {
-                if (shouldBeVisible) {
-                    imgElement.classList.add('active');
+
+            function maxSourcePosition() {
+                return scale ? maxScroll / scale : SOURCE_WIDTH;
+            }
+
+            function nearestEvent(position) {
+                return events.reduce((nearest, event) => {
+                    const eventPosition = event.x * SOURCE_WIDTH / 100;
+                    const nearestPosition = nearest.x * SOURCE_WIDTH / 100;
+                    return Math.abs(eventPosition - position) < Math.abs(nearestPosition - position) ? event : nearest;
+                }, events[0]);
+            }
+
+            function resizeTimeline() {
+                const oldSourcePosition = sourcePosition();
+                scale = window.innerHeight / SOURCE_HEIGHT;
+                worldWidth = SOURCE_WIDTH * scale;
+                timeline.style.width = `${worldWidth}px`;
+                timeline.style.height = `${window.innerHeight}px`;
+                maxScroll = Math.max(0, worldWidth - window.innerWidth);
+                scrollPosition = clamp(oldSourcePosition * scale, 0, maxScroll);
+                renderPosition();
+            }
+
+            function renderPosition() {
+                timeline.style.transform = `translate3d(${-scrollPosition}px, 0, 0)`;
+                const maximum = Math.max(1, maxScroll);
+                const ratio = clamp(scrollPosition / maximum, 0, 1);
+                const percent = Math.round(ratio * 100);
+                timelineRange.value = String(Math.round(ratio * 1000));
+                progressWrap.style.setProperty("--progress", `${ratio * 100}%`);
+                positionReadout.value = `${percent}%`;
+                positionReadout.textContent = `${percent}%`;
+                updateStoryState();
+            }
+
+            function setScrollPosition(nextPosition) {
+                scrollPosition = clamp(nextPosition, 0, maxScroll);
+                renderPosition();
+            }
+
+            function seekToSource(nextSourcePosition) {
+                setScrollPosition(nextSourcePosition * scale);
+            }
+
+            function preloadImage(source) {
+                return new Promise((resolve) => {
+                    const image = new Image();
+                    image.onload = () => resolve({ source, loaded: true });
+                    image.onerror = () => resolve({ source, loaded: false });
+                    image.src = source;
+                });
+            }
+
+            function preloadNarration(index) {
+                if (!scenes[index] || scenes[index].preloaded) return;
+                scenes[index].preloaded = true;
+                const image = new Image();
+                image.src = scenes[index].image;
+            }
+
+            function updateStoryState() {
+                const position = sourcePosition();
+
+                if (mode === "tour") {
+                    let nextIndex = scenes.findIndex((scene) => position >= scene.start && position < scene.end);
+                    if (nextIndex === -1) nextIndex = scenes.length - 1;
+
+                    if (nextIndex !== activeSceneIndex) {
+                        activeSceneIndex = nextIndex;
+                        const scene = scenes[nextIndex];
+                        narration.classList.remove("is-visible");
+                        window.setTimeout(() => {
+                            if (mode !== "tour" || activeSceneIndex !== nextIndex) return;
+                            narrationImage.src = scene.image;
+                            narrationImage.alt = `${scene.title}章节说明`;
+                            narration.classList.add("is-visible");
+                        }, 170);
+                        preloadNarration(nextIndex + 1);
+                    }
+
+                    modeEyebrow.textContent = playing ? "AUTO NARRATIVE" : "NARRATIVE PAUSED";
+                    chapterLabel.textContent = scenes[activeSceneIndex]?.title || "历史长卷";
                 } else {
-                    imgElement.classList.remove('active');
+                    const event = nearestEvent(position + window.innerWidth / Math.max(scale, 0.001) / 2);
+                    narration.classList.remove("is-visible");
+                    modeEyebrow.textContent = playing ? "AUTO EXPLORE" : "FREE EXPLORE";
+                    chapterLabel.textContent = `${event.id} · ${event.title}`;
                 }
-                visibilityCache.set(imgElement, shouldBeVisible);
             }
-        });
-    }
 
-    // 退出到全屏状态
-    function exitToCinematics() {
-        // 等待最后一个图片显示完毕后再退出
-        setTimeout(() => {
-            // 添加全屏模式类
-            body.classList.add('fullscreen-mode');
-            
-            // 隐藏控制按钮
-            document.querySelector('.scroll-controls').style.opacity = '0';
-            setTimeout(() => {
-                document.querySelector('.scroll-controls').style.display = 'none';
-            }, 1000);
-            
-            // 显示热点
-            hotspots.forEach(hotspot => {
-                hotspot.style.opacity = '1';
+            function updatePlayButton() {
+                playButton.textContent = playing ? "Ⅱ" : "▶";
+                playButton.setAttribute("aria-label", playing ? "暂停自动导览" : "继续自动导览");
+                updateStoryState();
+            }
+
+            function setPlaying(nextPlaying) {
+                playing = Boolean(nextPlaying) && scrollPosition < maxScroll;
+                lastFrameTime = performance.now();
+                updatePlayButton();
+            }
+
+            function setMode(nextMode, options = {}) {
+                mode = nextMode;
+                const isExplore = mode === "explore";
+                document.body.classList.toggle("is-explore", isExplore);
+                modeButton.setAttribute("aria-label", isExplore ? "从头重新观看导览" : "切换到自由探索");
+                modeButtonLabel.textContent = isExplore ? "重看导览" : "自由探索";
+                modeButton.querySelector(".icon").textContent = isExplore ? "↶" : "⌁";
+                activeSceneIndex = -1;
+                updateStoryState();
+
+                if (options.announce) {
+                    showToast(isExplore ? "已进入自由探索：拖动、滚轮或方向键浏览，点击光点查看详情" : "已回到自动导览");
+                }
+            }
+
+            function showToast(message) {
+                window.clearTimeout(toastTimer);
+                toast.textContent = message;
+                toast.classList.add("is-visible");
+                toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 3800);
+            }
+
+            function updateMusicButton() {
+                const isPlaying = !audio.paused;
+                musicIcon.textContent = isPlaying ? "♫" : "♪";
+                musicLabel.textContent = isPlaying ? "音乐开启" : "音乐暂停";
+                musicButton.setAttribute("aria-label", isPlaying ? "暂停背景音乐" : "播放背景音乐");
+                musicButton.setAttribute("aria-pressed", String(isPlaying));
+            }
+
+            async function startMusic() {
+                audio.volume = 0.5;
+                try {
+                    await audio.play();
+                } catch (error) {
+                    showToast("浏览器暂未播放音乐，可点击右上角音乐按钮开启");
+                }
+                updateMusicButton();
+            }
+
+            async function toggleMusic() {
+                if (audio.paused) {
+                    await startMusic();
+                } else {
+                    audio.pause();
+                    updateMusicButton();
+                }
+            }
+
+            function openDetail(event, hotspot) {
+                if (pointerTravel > 8) return;
+                resumeAfterDialog = playing;
+                setPlaying(false);
+                lastFocusedHotspot = hotspot;
+                detailHeading.textContent = event.title;
+                detailShell.classList.toggle("is-composite", Boolean(event.background && event.text));
+
+                if (event.background && event.text) {
+                    detailBackground.src = event.background;
+                    detailBackground.alt = `${event.title}详情背景`;
+                    detailText.src = event.text;
+                    detailText.alt = `${event.title}完整文字介绍`;
+                    detailTextScroll.scrollTop = 0;
+                    detailImage.removeAttribute("src");
+                    detailImage.alt = "";
+                } else {
+                    detailImage.src = event.image;
+                    detailImage.alt = `${event.title}历史介绍`;
+                    detailBackground.removeAttribute("src");
+                    detailText.removeAttribute("src");
+                }
+
+                detailDialog.showModal();
+                detailClose.focus({ preventScroll: true });
+            }
+
+            function closeDetail() {
+                if (!detailDialog.open) return;
+                detailDialog.close();
+            }
+
+            function buildHotspots() {
+                const fragment = document.createDocumentFragment();
+                events.forEach((event) => {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.className = "hotspot";
+                    button.textContent = event.id;
+                    button.dataset.title = event.title;
+                    button.style.setProperty("--x", `${event.x}%`);
+                    button.style.setProperty("--y", `${event.y}%`);
+                    button.setAttribute("aria-label", `${event.id}，${event.title}，打开详情`);
+                    button.addEventListener("click", () => openDetail(event, button));
+                    fragment.appendChild(button);
+                });
+                hotspotLayer.appendChild(fragment);
+            }
+
+            function animate(timestamp) {
+                const elapsedSeconds = Math.min((timestamp - lastFrameTime) / 1000, 0.08);
+                lastFrameTime = timestamp;
+
+                if (started && playing && !detailDialog.open) {
+                    setScrollPosition(scrollPosition + AUTO_SPEED * scale * elapsedSeconds);
+                    if (scrollPosition >= maxScroll - 0.5) {
+                        setPlaying(false);
+                        if (mode === "tour") {
+                            window.setTimeout(() => {
+                                if (mode !== "tour") return;
+                                setMode("explore", { announce: true });
+                            }, 900);
+                        } else {
+                            showToast("已到达时间轴末端，可向左拖动回看");
+                        }
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            function handlePointerDown(event) {
+                if (!started || detailDialog.open || event.button !== 0 || event.target.closest("button, input")) return;
+                pointerId = event.pointerId;
+                pointerStartX = event.clientX;
+                pointerStartScroll = scrollPosition;
+                pointerTravel = 0;
+                setPlaying(false);
+                stage.classList.add("is-dragging");
+                stage.setPointerCapture(pointerId);
+            }
+
+            function handlePointerMove(event) {
+                if (event.pointerId !== pointerId) return;
+                const delta = pointerStartX - event.clientX;
+                pointerTravel = Math.max(pointerTravel, Math.abs(delta));
+                setScrollPosition(pointerStartScroll + delta);
+            }
+
+            function handlePointerUp(event) {
+                if (event.pointerId !== pointerId) return;
+                if (stage.hasPointerCapture(pointerId)) stage.releasePointerCapture(pointerId);
+                pointerId = null;
+                stage.classList.remove("is-dragging");
+                if (pointerTravel > 8 && mode === "tour") {
+                    setMode("explore", { announce: false });
+                }
+                window.setTimeout(() => { pointerTravel = 0; }, 0);
+            }
+
+            function startExperience() {
+                if (started) return;
+                started = true;
+                document.body.classList.add("is-started");
+                opening.classList.add("is-hidden");
+                startMusic();
+
+                const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                window.setTimeout(() => {
+                    if (reduceMotion) {
+                        setMode("explore", { announce: true });
+                        setPlaying(false);
+                    } else {
+                        setPlaying(true);
+                    }
+                }, reduceMotion ? 50 : 2250);
+            }
+
+            async function prepareExperience() {
+                resizeTimeline();
+                buildHotspots();
+                preloadNarration(0);
+                preloadNarration(1);
+
+                const criticalLoad = Promise.all([
+                    preloadImage(NARRATIVE_BACKGROUND),
+                    preloadImage(EXPLORE_BACKGROUND),
+                    preloadImage(scenes[0].image)
+                ]);
+                const safetyTimeout = new Promise((resolve) => window.setTimeout(resolve, 12000));
+                await Promise.race([criticalLoad, safetyTimeout]);
+                openScrollButton.disabled = false;
+                openScrollButton.textContent = "启卷漫游";
+            }
+
+            openScrollButton.addEventListener("click", startExperience);
+
+            playButton.addEventListener("click", () => {
+                if (scrollPosition >= maxScroll - 1) seekToSource(0);
+                setPlaying(!playing);
             });
-            
-            // 隐藏所有弹出图片
-            popupImages.forEach(imgConfig => {
-                imgConfig.element.classList.remove('active');
+
+            restartButton.addEventListener("click", () => {
+                seekToSource(0);
+                if (mode === "tour") setPlaying(true);
+                showToast("已回到时间轴起点");
             });
-            
-            // 回到最左侧，并切换背景图片
-            setTimeout(() => {
-                scrollPosition = 0;
-                container.style.transition = 'transform 1s ease, background-image 1s ease';
-                // 切换背景图片
-                container.style.backgroundImage = 'url("images/layer2/background_layer2.jpg")';
-                updateScrollPosition();
-                
-                // 恢复transition设置
-                setTimeout(() => {
-                    container.style.transition = 'transform 0.5s ease';
-                    // 启用手指拖动功能
-                    enableDragging();
-                }, 1000);
-            }, 500);
-        }, 1500);
-    }
 
-    // 新增拖动功能
-    let isDragging = false;
-    let startX = 0;
-    let startScrollPosition = 0;
-    
-    function enableDragging() {
-        console.log("启用拖动功能");
-        
-        // 处理触摸事件（移动设备）
-        container.addEventListener('touchstart', handleDragStart, { passive: false });
-        container.addEventListener('touchmove', handleDragMove, { passive: false });
-        container.addEventListener('touchend', handleDragEnd);
-        
-        // 处理鼠标事件（桌面设备）
-        container.addEventListener('mousedown', handleDragStart);
-        document.addEventListener('mousemove', handleDragMove);
-        document.addEventListener('mouseup', handleDragEnd);
-    }
-    
-    function handleDragStart(e) {
-        if (isScrolling) return; // 如果正在自动滚动，则不启用拖动
-        
-        isDragging = true;
-        startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-        startScrollPosition = scrollPosition;
-        
-        // 阻止默认行为，防止滚动冲突
-        if (e.cancelable) {
-            e.preventDefault();
-        }
-        
-        // 暂时取消transition，以获得更流畅的拖动效果
-        container.style.transition = 'none';
-    }
-    
-    function handleDragMove(e) {
-        if (!isDragging) return;
-        
-        // 计算拖动距离
-        const x = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-        const deltaX = startX - x;
-        
-        // 更新滚动位置
-        let newPosition = startScrollPosition + deltaX;
-        
-        // 限制滚动范围
-        newPosition = Math.max(0, Math.min(newPosition, maxScroll));
-        
-        // 更新位置
-        scrollPosition = newPosition;
-        updateScrollPosition();
-        
-        // 阻止默认行为，防止滚动冲突
-        if (e.cancelable) {
-            e.preventDefault();
-        }
-    }
-    
-    function handleDragEnd(e) {
-        if (!isDragging) return;
-        
-        isDragging = false;
-        
-        // 恢复transition效果
-        container.style.transition = 'transform 0.5s ease';
-    }
+            modeButton.addEventListener("click", () => {
+                if (mode === "tour") {
+                    setMode("explore", { announce: true });
+                    setPlaying(false);
+                } else {
+                    seekToSource(0);
+                    setMode("tour", { announce: true });
+                    setPlaying(true);
+                }
+            });
 
-    // 初始化应用
-    async function initializeApp() {
-        console.log("开始初始化应用...");
-        
-        // 首先加载所有图片
-        await preloadImages();
-        
-        // 然后创建DOM元素
-        createIntroImages();
-        createPopupImages();
-        
-        // 隐藏加载屏幕
-        setTimeout(() => {
-            loadingScreen.style.opacity = '0';
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-            }, 1000);
-            
-            // 显示电影感黑边
-            setTimeout(() => {
-                topBar.style.height = '8%';
-                bottomBar.style.height = '8%';
-                
-                // 开始卷轴滚动
-                setTimeout(startScrolling, 1000);
-            }, 500);
-        }, 500);
-    }
+            musicButton.addEventListener("click", toggleMusic);
+            audio.addEventListener("play", updateMusicButton);
+            audio.addEventListener("pause", updateMusicButton);
 
-    // 页面加载完成后初始化
-    window.addEventListener('load', initializeApp);
+            timelineRange.addEventListener("pointerdown", () => setPlaying(false));
+            timelineRange.addEventListener("input", () => {
+                const ratio = Number(timelineRange.value) / 1000;
+                setScrollPosition(maxScroll * ratio);
+                if (mode === "tour") setMode("explore", { announce: false });
+            });
 
-    // 绑定控制按钮事件
-    pauseBtn.addEventListener('click', pauseScrolling);
-    playBtn.addEventListener('click', startScrolling);
-    restartBtn.addEventListener('click', resetScrolling);
-    
-    // 初始显示播放按钮
-    pauseBtn.style.display = 'none';
+            stage.addEventListener("pointerdown", handlePointerDown);
+            stage.addEventListener("pointermove", handlePointerMove);
+            stage.addEventListener("pointerup", handlePointerUp);
+            stage.addEventListener("pointercancel", handlePointerUp);
 
-    // 监听窗口大小变化，动态调整性能
-    window.addEventListener('resize', () => {
-        // 根据窗口大小调整滚动速度
-        if (window.innerWidth < 768) {
-            scrollSpeed = 2; // 较小的屏幕滚动慢一些
-        } else {
-            scrollSpeed = 3; // 大屏幕正常速度
-        }
-    });
-    
-    // 检测设备性能
-    function checkDevicePerformance() {
-        const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!gl) {
-            // WebGL不可用，假定低性能设备
-            return false;
-        }
-        
-        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-        if (!debugInfo) {
-            return true; // 无法确定，假定正常性能
-        }
-        
-        const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-        // 检查是否为已知的低性能GPU
-        if (/(intel|microsoft|swiftshader)/i.test(renderer)) {
-            return false;
-        }
-        
-        return true;
-    }
-    
-    // 根据设备性能调整设置
-    if (!checkDevicePerformance()) {
-        console.log("检测到低性能设备，调整设置");
-        scrollSpeed = 2;
-        // 禁用一些效果
-        document.body.classList.add('low-performance-mode');
-    }
-</script>
+            stage.addEventListener("wheel", (event) => {
+                if (!started || detailDialog.open) return;
+                event.preventDefault();
+                setPlaying(false);
+                if (mode === "tour") setMode("explore", { announce: false });
+                const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+                setScrollPosition(scrollPosition + delta * 1.2);
+            }, { passive: false });
+
+            window.addEventListener("keydown", (event) => {
+                if (!started || detailDialog.open || event.target.matches("input, button")) return;
+                const step = event.shiftKey ? window.innerWidth * 0.75 : 120;
+                if (["ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) {
+                    event.preventDefault();
+                }
+
+                if (event.key === "ArrowLeft" || event.key === "PageUp") {
+                    setPlaying(false);
+                    setMode("explore", { announce: false });
+                    setScrollPosition(scrollPosition - step);
+                } else if (event.key === "ArrowRight" || event.key === "PageDown") {
+                    setPlaying(false);
+                    setMode("explore", { announce: false });
+                    setScrollPosition(scrollPosition + step);
+                } else if (event.key === "Home") {
+                    setScrollPosition(0);
+                } else if (event.key === "End") {
+                    setScrollPosition(maxScroll);
+                } else if (event.key === " ") {
+                    setPlaying(!playing);
+                }
+            });
+
+            detailClose.addEventListener("click", closeDetail);
+            detailDialog.addEventListener("click", (event) => {
+                if (event.target === detailDialog) closeDetail();
+            });
+            detailDialog.addEventListener("close", () => {
+                if (lastFocusedHotspot) lastFocusedHotspot.focus({ preventScroll: true });
+                if (resumeAfterDialog) setPlaying(true);
+                resumeAfterDialog = false;
+            });
+
+            window.addEventListener("resize", resizeTimeline, { passive: true });
+            window.addEventListener("orientationchange", resizeTimeline, { passive: true });
+
+            prepareExperience();
+            requestAnimationFrame(animate);
+        })();
+    </script>
 </body>
 </html>
