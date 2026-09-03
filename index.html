@@ -1332,7 +1332,10 @@
                     0,
                     detailShell.offsetLeft + (detailShell.offsetWidth - detailPan.clientWidth) / 2
                 );
-                detailPan.scrollTop = Math.max(0, detailShell.offsetTop - 12);
+                detailPan.scrollTop = Math.max(
+                    0,
+                    detailShell.offsetTop + (detailShell.offsetHeight - detailPan.clientHeight) / 2
+                );
             }
 
             function showToast(message) {
