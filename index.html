@@ -666,7 +666,10 @@
         }
 
         .detail-dialog {
-            width: auto;
+            position: fixed;
+            inset: 0;
+            width: min(92vw, calc(84vh * 1.5472), 1320px);
+            height: auto;
             max-width: none;
             max-height: none;
             margin: auto;
@@ -679,6 +682,11 @@
             box-shadow: 0 28px 90px rgba(0, 0, 0, 0.62);
         }
 
+        .detail-pan {
+            display: block;
+            width: 100%;
+        }
+
         .detail-dialog::backdrop {
             background: rgba(12, 8, 5, 0.78);
             backdrop-filter: blur(7px) saturate(0.7);
@@ -686,7 +694,7 @@
 
         .detail-shell {
             position: relative;
-            width: min(92vw, calc(84vh * 1.5472), 1320px);
+            width: 100%;
             aspect-ratio: 1934 / 1250;
             overflow: hidden;
             border-radius: clamp(8px, 1.6vw, 24px);
@@ -953,14 +961,21 @@
                 width: 100vw;
                 height: 100vh;
                 height: 100dvh;
+                aspect-ratio: auto;
                 max-width: none;
                 max-height: none;
                 margin: 0;
-                overflow: auto;
-                overscroll-behavior: contain;
+                overflow: hidden;
                 border-radius: 0;
                 background: rgba(13, 9, 6, 0.96);
                 box-shadow: none;
+            }
+
+            .detail-pan {
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                overscroll-behavior: contain;
                 touch-action: pan-x pan-y pinch-zoom;
                 -webkit-overflow-scrolling: touch;
             }
@@ -1110,17 +1125,19 @@
 
         <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-heading">
             <h2 id="detail-heading" class="sr-only">历史事件详情</h2>
-            <div id="detail-shell" class="detail-shell">
-                <img id="detail-image" class="detail-image" src="" alt="">
-                <div class="detail-composite">
-                    <img id="detail-background" class="detail-background" src="" alt="">
-                    <div id="detail-text-scroll" class="detail-text-scroll" tabindex="0" aria-label="上下滚动阅读完整介绍">
-                        <img id="detail-text" src="" alt="">
+            <div id="detail-pan" class="detail-pan">
+                <div id="detail-shell" class="detail-shell">
+                    <img id="detail-image" class="detail-image" src="" alt="">
+                    <div class="detail-composite">
+                        <img id="detail-background" class="detail-background" src="" alt="">
+                        <div id="detail-text-scroll" class="detail-text-scroll" tabindex="0" aria-label="上下滚动阅读完整介绍">
+                            <img id="detail-text" src="" alt="">
+                        </div>
                     </div>
+                    <button id="detail-close" class="detail-close" type="button" aria-label="关闭详情">
+                        <span class="sr-only">关闭</span>
+                    </button>
                 </div>
-                <button id="detail-close" class="detail-close" type="button" aria-label="关闭详情">
-                    <span class="sr-only">关闭</span>
-                </button>
             </div>
         </dialog>
 
@@ -1184,6 +1201,7 @@
             const audio = document.getElementById("bgm");
             const detailDialog = document.getElementById("detail-dialog");
             const detailHeading = document.getElementById("detail-heading");
+            const detailPan = document.getElementById("detail-pan");
             const detailShell = document.getElementById("detail-shell");
             const detailImage = document.getElementById("detail-image");
             const detailBackground = document.getElementById("detail-background");
@@ -1305,13 +1323,16 @@
             function positionDetailForViewport() {
                 const isPortraitMobile = window.matchMedia("(orientation: portrait) and (max-width: 900px)").matches;
                 if (!isPortraitMobile) {
-                    detailDialog.scrollLeft = 0;
-                    detailDialog.scrollTop = 0;
+                    detailPan.scrollLeft = 0;
+                    detailPan.scrollTop = 0;
                     return;
                 }
 
-                detailDialog.scrollLeft = Math.max(0, (detailDialog.scrollWidth - detailDialog.clientWidth) / 2);
-                detailDialog.scrollTop = Math.max(0, detailShell.offsetTop - 12);
+                detailPan.scrollLeft = Math.max(
+                    0,
+                    detailShell.offsetLeft + (detailShell.offsetWidth - detailPan.clientWidth) / 2
+                );
+                detailPan.scrollTop = Math.max(0, detailShell.offsetTop - 12);
             }
 
             function showToast(message) {
@@ -1360,7 +1381,7 @@
                 detailText.removeAttribute("src");
                 detailDialog.showModal();
                 detailClose.focus({ preventScroll: true });
-                requestAnimationFrame(positionDetailForViewport);
+                requestAnimationFrame(() => requestAnimationFrame(positionDetailForViewport));
 
                 const loaded = await preloadEventDetails(event, "high");
                 if (requestId !== detailRequestId || !detailDialog.open) return;
@@ -1389,7 +1410,10 @@
                 }
 
                 if (requestId === detailRequestId && detailDialog.open) {
-                    requestAnimationFrame(() => detailShell.classList.remove("is-loading"));
+                    requestAnimationFrame(() => {
+                        detailShell.classList.remove("is-loading");
+                        positionDetailForViewport();
+                    });
                 }
             }
 
