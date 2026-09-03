@@ -667,12 +667,15 @@
 
         .detail-dialog {
             position: fixed;
-            inset: 0;
+            inset: auto;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: min(92vw, calc(84vh * 1.5472), 1320px);
             height: auto;
             max-width: none;
             max-height: none;
-            margin: auto;
+            margin: 0;
             padding: 0;
             overflow: visible;
             color: var(--ink);
@@ -958,6 +961,10 @@
             }
 
             .detail-dialog {
+                inset: 0;
+                top: 0;
+                left: 0;
+                transform: none;
                 width: 100vw;
                 height: 100vh;
                 height: 100dvh;
