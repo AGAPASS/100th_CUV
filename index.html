@@ -834,18 +834,50 @@
             background: #ead7b4;
         }
 
+        .detail-shell::before {
+            content: "正在打开历史详情…";
+            position: absolute;
+            z-index: 5;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 11px 18px;
+            color: #6e381d;
+            font-size: clamp(14px, 1.5vw, 18px);
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+            border: 1px solid rgba(134, 75, 33, 0.25);
+            border-radius: 999px;
+            background: rgba(248, 233, 204, 0.9);
+            box-shadow: 0 8px 28px rgba(66, 35, 16, 0.16);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s ease;
+        }
+
+        .detail-shell.is-loading::before {
+            opacity: 1;
+        }
+
         .detail-image,
         .detail-background {
             display: block;
             width: 100%;
             height: 100%;
             object-fit: contain;
+            transition: opacity 0.2s ease;
         }
 
         .detail-composite {
             position: absolute;
             inset: 0;
             display: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .detail-shell.is-loading .detail-image,
+        .detail-shell.is-loading .detail-composite {
+            opacity: 0;
         }
 
         .detail-shell.is-composite .detail-image {
@@ -886,6 +918,19 @@
             border-radius: 50%;
             background: transparent;
             cursor: pointer;
+        }
+
+        .detail-shell.is-loading .detail-close {
+            display: grid;
+            place-items: center;
+            color: #fff6e7;
+            font-family: Arial, sans-serif;
+            font-size: clamp(28px, 4vw, 46px);
+            background: rgba(102, 51, 25, 0.74);
+        }
+
+        .detail-shell.is-loading .detail-close::before {
+            content: "×";
         }
 
         .detail-close:focus-visible {
@@ -1092,31 +1137,33 @@
                 { title: "和合本面世", start: 15000, end: SOURCE_WIDTH, side: "right", image: "images/layer1/copywriting-optimized/19.webp", summary: "历经近三十年翻译、战乱与人事变迁，《官话和合本》终于出版发行。" }
             ];
 
+            // Reference board: 12408×606. The timeline is 17060×806; its matching
+            // background begins 18.62 source pixels before the reference crop.
             const events = [
-                { id: 1, title: "丝绸之路", x: 3.63, y: 45.05, image: "images/layer3/1丝绸之路_画板 1.png" },
-                { id: 2, title: "最古铁十字架", x: 11.98, y: 29.37, image: "images/layer3/2最古铁十字架_画板 1.png" },
-                { id: 3, title: "景教入华", x: 17.97, y: 58.25, image: "images/layer3/3景教_画板 1.png" },
-                { id: 4, title: "大秦景教流行中国碑", x: 25.09, y: 31.52, image: "images/layer3/4流行中国碑_画板 1.png" },
-                { id: 5, title: "聂斯多略派教徒墓碑", x: 31.11, y: 68.48, image: "images/layer3/5聂斯多略派教徒墓碑_画板 1.png" },
-                { id: 6, title: "也里可温教", x: 36.32, y: 48.35, image: "images/layer3/6也里可温教_画板 1.png" },
-                { id: 7, title: "孟高维诺译本", x: 40.74, y: 69.64, image: "images/layer3/7孟高维诺译本_画板 1.png" },
-                { id: 8, title: "祖传天主十诫", x: 50.28, y: 58.25, image: "images/layer3/8祖传天主十诫_画板 1.png" },
-                { id: 9, title: "闭关锁国", x: 44.35, y: 10.23, image: "images/layer3/9闭关锁国_画板 1.png" },
-                { id: 10, title: "西学东渐", x: 50.61, y: 46.70, image: "images/layer3/10西学东渐_画板 1.png" },
-                { id: 11, title: "徐光启与《几何原本》", x: 51.39, y: 56.77, image: "images/layer3/11徐光启与几何原本_画板 1.png" },
-                { id: 12, title: "康熙与《十架颂》", x: 56.35, y: 62.05, background: "images/layer3/12康熙与十字架（背景）_画板 1.png", text: "images/layer3/12康熙与十字架（文字）_画板 1_画板 1.png" },
-                { id: 13, title: "礼仪之争", x: 63.02, y: 30.53, image: "images/layer3/13礼仪之争_画板 1.png" },
-                { id: 14, title: "百年禁教", x: 66.59, y: 88.61, image: "images/layer3/14百年禁教_画板 1.png" },
-                { id: 15, title: "马礼逊：新教第一人", x: 71.74, y: 38.12, image: "images/layer3/15新教第一人_画板 1.png" },
-                { id: 16, title: "《神天圣书》", x: 70.80, y: 79.21, image: "images/layer3/16神天圣书_画板 1.png" },
-                { id: 17, title: "中国第一位新教徒", x: 74.30, y: 57.10, image: "images/layer3/17中国第一位新教徒_画板 1.png" },
-                { id: 18, title: "大规模中文译经", x: 77.46, y: 29.04, background: "images/layer3/18大规模中文译经（背景）_画板 1.png", text: "images/layer3/18大规模中文译经（滑动文字）_画板 1_画板 1_画板 1.png" },
-                { id: 19, title: "太平天国运动", x: 81.41, y: 25.41, image: "images/layer3/19太平天国运动_画板 1.png" },
-                { id: 20, title: "《新旧遗诏圣书》", x: 83.26, y: 35.97, image: "images/layer3/20新旧遗诏圣书_画板 1.png" },
-                { id: 21, title: "义和团运动", x: 88.41, y: 18.15, image: "images/layer3/21义和团运动_画板 1.png" },
-                { id: 22, title: "辛亥革命", x: 92.34, y: 16.83, image: "images/layer3/22辛亥革命_画板 1.png" },
-                { id: 23, title: "五四运动", x: 95.06, y: 27.72, image: "images/layer3/23五四运动_画板 1.png" },
-                { id: 24, title: "官话和合本", x: 92.16, y: 67.00, image: "images/layer3/24官话和合本_画板 1.png" }
+                { id: 1, title: "丝绸之路", x: 3.62, y: 45.05, image: "images/layer3/optimized/01.webp" },
+                { id: 2, title: "最古铁十字架", x: 11.70, y: 29.37, image: "images/layer3/optimized/02.webp" },
+                { id: 3, title: "景教入华", x: 17.49, y: 58.25, image: "images/layer3/optimized/03.webp" },
+                { id: 4, title: "大秦景教流行中国碑", x: 24.38, y: 31.52, image: "images/layer3/optimized/04.webp" },
+                { id: 5, title: "聂斯多略派教徒墓碑", x: 30.20, y: 68.48, image: "images/layer3/optimized/05.webp" },
+                { id: 6, title: "也里可温教", x: 35.24, y: 48.35, image: "images/layer3/optimized/06.webp" },
+                { id: 7, title: "孟高维诺译本", x: 39.52, y: 69.64, image: "images/layer3/optimized/07.webp" },
+                { id: 8, title: "祖传天主十诫", x: 48.75, y: 58.25, image: "images/layer3/optimized/08.webp" },
+                { id: 9, title: "闭关锁国", x: 43.01, y: 10.23, image: "images/layer3/optimized/09.webp" },
+                { id: 10, title: "西学东渐", x: 49.07, y: 46.70, image: "images/layer3/optimized/10.webp" },
+                { id: 11, title: "徐光启与《几何原本》", x: 49.82, y: 56.77, image: "images/layer3/optimized/11.webp" },
+                { id: 12, title: "康熙与《十架颂》", x: 54.62, y: 62.05, background: "images/layer3/optimized/12-background.webp", text: "images/layer3/optimized/12-text.webp" },
+                { id: 13, title: "礼仪之争", x: 61.07, y: 30.53, image: "images/layer3/optimized/13.webp" },
+                { id: 14, title: "百年禁教", x: 64.53, y: 88.61, image: "images/layer3/optimized/14.webp" },
+                { id: 15, title: "马礼逊：新教第一人", x: 69.51, y: 38.12, image: "images/layer3/optimized/15.webp" },
+                { id: 16, title: "《神天圣书》", x: 68.60, y: 79.21, image: "images/layer3/optimized/16.webp" },
+                { id: 17, title: "中国第一位新教徒", x: 71.98, y: 57.10, image: "images/layer3/optimized/17.webp" },
+                { id: 18, title: "大规模中文译经", x: 75.04, y: 29.04, background: "images/layer3/optimized/18-background.webp", text: "images/layer3/optimized/18-text.webp" },
+                { id: 19, title: "太平天国运动", x: 78.86, y: 25.41, image: "images/layer3/optimized/19.webp" },
+                { id: 20, title: "《新旧遗诏圣书》", x: 80.65, y: 35.97, image: "images/layer3/optimized/20.webp" },
+                { id: 21, title: "义和团运动", x: 85.63, y: 18.15, image: "images/layer3/optimized/21.webp" },
+                { id: 22, title: "辛亥革命", x: 89.43, y: 16.83, image: "images/layer3/optimized/22.webp" },
+                { id: 23, title: "五四运动", x: 92.07, y: 27.72, image: "images/layer3/optimized/23.webp" },
+                { id: 24, title: "官话和合本", x: 89.26, y: 67.00, image: "images/layer3/optimized/24.webp" }
             ];
 
             const stage = document.getElementById("stage");
@@ -1163,6 +1210,7 @@
             let narrativeReady = false;
             let narrativeLoadPromise = null;
             let lastFocusedHotspot = null;
+            let detailRequestId = 0;
             let toastTimer = 0;
             let pointerId = null;
             let pointerStartX = 0;
@@ -1206,6 +1254,7 @@
                 positionReadout.value = `${percent}%`;
                 positionReadout.textContent = `${percent}%`;
                 updateStoryState();
+                if (started) preloadNearbyDetails();
             }
 
             function setScrollPosition(nextPosition) {
@@ -1217,13 +1266,43 @@
                 setScrollPosition(nextSourcePosition * scale);
             }
 
-            function preloadImage(source) {
+            function preloadImage(source, priority = "auto") {
                 return new Promise((resolve) => {
                     const image = new Image();
+                    image.decoding = "async";
+                    image.fetchPriority = priority;
                     image.onload = () => resolve({ source, loaded: true });
                     image.onerror = () => resolve({ source, loaded: false });
                     image.src = source;
                 });
+            }
+
+            function preloadEventDetails(event, priority = "low") {
+                if (!event.detailPromise) {
+                    const sources = event.image ? [event.image] : [event.background, event.text];
+                    event.detailPromise = Promise.all(sources.map((source) => preloadImage(source, priority)))
+                        .then((results) => {
+                            const loaded = results.every((result) => result.loaded);
+                            if (!loaded) event.detailPromise = null;
+                            return loaded;
+                        });
+                }
+                return event.detailPromise;
+            }
+
+            function preloadNearbyDetails() {
+                if (navigator.connection?.saveData) return;
+                const viewportSourceWidth = window.innerWidth / Math.max(scale, 0.001);
+                const left = sourcePosition() - 650;
+                const right = sourcePosition() + viewportSourceWidth + 900;
+                events.forEach((event) => {
+                    const eventPosition = event.x * SOURCE_WIDTH / 100;
+                    if (eventPosition >= left && eventPosition <= right) preloadEventDetails(event);
+                });
+            }
+
+            function decodeImage(element) {
+                return typeof element.decode === "function" ? element.decode().catch(() => undefined) : Promise.resolve();
             }
 
             function preloadNarration(index) {
@@ -1361,11 +1440,27 @@
                 }
             }
 
-            function openDetail(event, hotspot) {
+            async function openDetail(event, hotspot) {
                 if (pointerTravel > 8) return;
+                const requestId = ++detailRequestId;
                 lastFocusedHotspot = hotspot;
                 detailHeading.textContent = event.title;
                 detailShell.classList.toggle("is-composite", Boolean(event.background && event.text));
+                detailShell.classList.add("is-loading");
+                detailImage.removeAttribute("src");
+                detailBackground.removeAttribute("src");
+                detailText.removeAttribute("src");
+                detailDialog.showModal();
+                detailClose.focus({ preventScroll: true });
+
+                const loaded = await preloadEventDetails(event, "high");
+                if (requestId !== detailRequestId || !detailDialog.open) return;
+
+                if (!loaded) {
+                    closeDetail();
+                    showToast("详情图片暂未加载成功，请稍后重试");
+                    return;
+                }
 
                 if (event.background && event.text) {
                     detailBackground.src = event.background;
@@ -1375,19 +1470,24 @@
                     detailTextScroll.scrollTop = 0;
                     detailImage.removeAttribute("src");
                     detailImage.alt = "";
+                    await Promise.all([decodeImage(detailBackground), decodeImage(detailText)]);
                 } else {
                     detailImage.src = event.image;
                     detailImage.alt = `${event.title}历史介绍`;
                     detailBackground.removeAttribute("src");
                     detailText.removeAttribute("src");
+                    await decodeImage(detailImage);
                 }
 
-                detailDialog.showModal();
-                detailClose.focus({ preventScroll: true });
+                if (requestId === detailRequestId && detailDialog.open) {
+                    requestAnimationFrame(() => detailShell.classList.remove("is-loading"));
+                }
             }
 
             function closeDetail() {
                 if (!detailDialog.open) return;
+                detailRequestId += 1;
+                detailShell.classList.remove("is-loading");
                 detailDialog.close();
             }
 
@@ -1402,6 +1502,8 @@
                     button.style.setProperty("--x", `${event.x}%`);
                     button.style.setProperty("--y", `${event.y}%`);
                     button.setAttribute("aria-label", `${event.id}，${event.title}，打开详情`);
+                    button.addEventListener("pointerenter", () => preloadEventDetails(event));
+                    button.addEventListener("focus", () => preloadEventDetails(event));
                     button.addEventListener("click", () => openDetail(event, button));
                     fragment.appendChild(button);
                 });
@@ -1439,6 +1541,7 @@
                 document.body.classList.add("is-started");
                 opening.classList.add("is-hidden");
                 startMusic();
+                preloadNearbyDetails();
 
                 window.setTimeout(() => {
                     setMode("explore", { announce: false });
