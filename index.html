@@ -61,7 +61,8 @@
         .app {
             position: relative;
             width: 100%;
-            height: 100%;
+            height: 100vh;
+            height: 100dvh;
             isolation: isolate;
             background:
                 radial-gradient(circle at 50% 48%, rgba(113, 68, 31, 0.2), transparent 38%),
@@ -638,32 +639,6 @@
             letter-spacing: 0.04em;
         }
 
-        .rotate-tip {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 80;
-            place-items: center;
-            padding: 32px;
-            color: #f7e6c2;
-            text-align: center;
-            background: rgba(14, 9, 6, 0.96);
-        }
-
-        .rotate-tip strong {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 26px;
-            font-weight: 400;
-            letter-spacing: 0.12em;
-        }
-
-        .rotate-tip span {
-            color: rgba(247, 230, 194, 0.68);
-            font-family: system-ui, sans-serif;
-            font-size: 14px;
-        }
-
         .toast {
             position: fixed;
             z-index: 46;
@@ -822,39 +797,242 @@
             outline-offset: -7px;
         }
 
-        @media (max-width: 760px) {
+        @media (max-width: 900px), (max-height: 560px) {
             .site-mark strong,
             .hud-button .label,
             .position-readout {
                 display: none;
             }
 
+            .site-mark {
+                top: max(10px, calc(env(safe-area-inset-top) + 7px));
+                left: max(12px, calc(env(safe-area-inset-left) + 10px));
+            }
+
+            .site-mark .brand-badge {
+                width: 52px;
+                padding: 5px 6px 4px;
+            }
+
+            .top-actions {
+                top: max(10px, calc(env(safe-area-inset-top) + 7px));
+                right: max(12px, calc(env(safe-area-inset-right) + 10px));
+            }
+
             .hud-button {
-                width: 40px;
+                width: 44px;
+                min-height: 44px;
                 padding: 0;
             }
 
             .timeline-controls {
-                width: min(94vw, 760px);
-                grid-template-columns: auto 1fr;
+                bottom: max(10px, calc(env(safe-area-inset-bottom) + 8px));
+                width: calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right));
+                padding: 7px 9px;
+                grid-template-columns: auto minmax(0, 1fr);
+                gap: 9px;
+                border-radius: 15px;
             }
 
-            .position-readout {
-                min-width: 0;
+            .round-button {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
+
+            .progress-wrap {
+                height: 44px;
+            }
+
+            .timeline-range {
+                height: 44px;
+                touch-action: pan-x;
+            }
+
+            .timeline-range::-webkit-slider-thumb {
+                width: 20px;
+                height: 20px;
+                margin-top: -9px;
+            }
+
+            .timeline-range::-moz-range-thumb {
+                width: 18px;
+                height: 18px;
             }
 
             .chapter-status {
-                bottom: max(78px, calc(env(safe-area-inset-bottom) + 68px));
+                bottom: max(82px, calc(env(safe-area-inset-bottom) + 78px));
+                width: calc(100vw - 36px - env(safe-area-inset-left) - env(safe-area-inset-right));
+            }
+
+            .chapter-status .eyebrow {
+                display: none;
+            }
+
+            .chapter-status strong {
+                font-size: 15px;
+                letter-spacing: 0.05em;
+            }
+
+            .hotspot {
+                --marker-size: 46px;
+                font-size: 16px;
+            }
+
+            .hotspot::before {
+                inset: -7px;
             }
 
             .hotspot::after {
                 display: none;
             }
+
+            .toast {
+                top: max(76px, calc(env(safe-area-inset-top) + 66px));
+                width: calc(100vw - 32px);
+                max-width: 520px;
+                padding: 9px 13px;
+                font-size: 13px;
+            }
         }
 
         @media (orientation: portrait) and (max-width: 900px) {
-            .rotate-tip {
-                display: grid;
+            .opening {
+                padding:
+                    max(24px, calc(env(safe-area-inset-top) + 18px))
+                    max(18px, calc(env(safe-area-inset-right) + 14px))
+                    max(24px, calc(env(safe-area-inset-bottom) + 18px))
+                    max(18px, calc(env(safe-area-inset-left) + 14px));
+            }
+
+            .opening::before {
+                inset: 10px;
+            }
+
+            .opening-content {
+                width: min(100%, 440px);
+            }
+
+            .opening-brand {
+                width: 84px;
+                margin-bottom: 18px;
+                padding: 9px 10px;
+            }
+
+            .opening-kicker {
+                margin-bottom: 10px;
+                font-size: 10px;
+                letter-spacing: 0.23em;
+            }
+
+            .opening h1 {
+                font-size: clamp(38px, 12vw, 54px);
+                line-height: 1.12;
+                letter-spacing: 0.12em;
+            }
+
+            .opening .subtitle {
+                margin: 16px auto 24px;
+                font-size: 14px;
+                line-height: 1.65;
+            }
+
+            .open-scroll {
+                min-width: 168px;
+                min-height: 50px;
+                font-size: 16px;
+            }
+
+            .opening-hint {
+                max-width: 270px;
+                margin: 14px auto 0;
+                line-height: 1.55;
+            }
+
+            .detail-dialog {
+                width: 100vw;
+                height: 100vh;
+                height: 100dvh;
+                max-width: none;
+                max-height: none;
+                margin: 0;
+                overflow: auto;
+                overscroll-behavior: contain;
+                border-radius: 0;
+                background: rgba(13, 9, 6, 0.96);
+                box-shadow: none;
+                touch-action: pan-x pan-y pinch-zoom;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .detail-shell {
+                width: max(760px, 100vw);
+                max-width: none;
+                margin-block: max(72px, calc((100vh - 492px) / 2));
+                margin-block: max(72px, calc((100dvh - 492px) / 2));
+                border-radius: 12px;
+            }
+
+            .detail-close {
+                position: fixed;
+                top: max(12px, calc(env(safe-area-inset-top) + 8px));
+                right: max(12px, calc(env(safe-area-inset-right) + 8px));
+                width: 48px;
+                height: 48px;
+                color: #fff6e7;
+                font-family: Arial, sans-serif;
+                font-size: 34px;
+                line-height: 1;
+                border: 1px solid rgba(245, 213, 153, 0.58);
+                background: rgba(75, 36, 18, 0.9);
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+                backdrop-filter: blur(8px);
+            }
+
+            .detail-close::before {
+                content: "×";
+            }
+        }
+
+        @media (max-height: 620px) {
+            .opening {
+                padding-top: max(12px, env(safe-area-inset-top));
+                padding-bottom: max(12px, env(safe-area-inset-bottom));
+            }
+
+            .opening::before {
+                inset: 8px;
+            }
+
+            .opening-brand {
+                width: 62px;
+                margin-bottom: 8px;
+                padding: 6px 7px;
+            }
+
+            .opening-kicker {
+                display: none;
+            }
+
+            .opening h1 {
+                font-size: clamp(30px, 10vh, 46px);
+                line-height: 1.02;
+            }
+
+            .opening .subtitle {
+                margin: 8px auto 12px;
+                font-size: 13px;
+                line-height: 1.4;
+            }
+
+            .open-scroll {
+                min-height: 44px;
+                font-size: 15px;
+            }
+
+            .opening-hint {
+                margin-top: 8px;
+                font-size: 11px;
             }
         }
 
@@ -924,16 +1102,9 @@
                 <h1 id="opening-title">千年薪火<br>百年和合</h1>
                 <p class="subtitle">沿一轴古卷，回望基督教传入中国<br>与中文圣经翻译的千年足迹</p>
                 <button id="open-scroll" class="open-scroll" type="button" disabled>画卷加载中…</button>
-                <p class="opening-hint">启卷后自由探索 · 左右拖动并点击光点查看详情</p>
+                <p class="opening-hint">启卷后自由探索 · 左右滑动或拖动画卷，点击光点查看详情</p>
             </div>
         </section>
-
-        <div class="rotate-tip" role="status">
-            <div>
-                <strong>请横屏启卷</strong>
-                <span>横向观看可获得完整的时间轴体验</span>
-            </div>
-        </div>
 
         <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -1051,13 +1222,16 @@
 
             function resizeTimeline() {
                 const oldSourcePosition = sourcePosition();
-                scale = window.innerHeight / SOURCE_HEIGHT;
+                const viewportHeight = stage.clientHeight || window.innerHeight;
+                const viewportWidth = stage.clientWidth || window.innerWidth;
+                scale = viewportHeight / SOURCE_HEIGHT;
                 worldWidth = SOURCE_WIDTH * scale;
                 timeline.style.width = `${worldWidth}px`;
-                timeline.style.height = `${window.innerHeight}px`;
-                maxScroll = Math.max(0, worldWidth - window.innerWidth);
+                timeline.style.height = `${viewportHeight}px`;
+                maxScroll = Math.max(0, worldWidth - viewportWidth);
                 scrollPosition = clamp(oldSourcePosition * scale, 0, maxScroll);
                 renderPosition();
+                if (detailDialog.open) requestAnimationFrame(positionDetailForViewport);
             }
 
             function renderPosition() {
@@ -1108,7 +1282,7 @@
 
             function preloadNearbyDetails() {
                 if (navigator.connection?.saveData) return;
-                const viewportSourceWidth = window.innerWidth / Math.max(scale, 0.001);
+                const viewportSourceWidth = stage.clientWidth / Math.max(scale, 0.001);
                 const left = sourcePosition() - 650;
                 const right = sourcePosition() + viewportSourceWidth + 900;
                 events.forEach((event) => {
@@ -1123,9 +1297,21 @@
 
             function updateExploreStatus() {
                 const position = sourcePosition();
-                const event = nearestEvent(position + window.innerWidth / Math.max(scale, 0.001) / 2);
+                const event = nearestEvent(position + stage.clientWidth / Math.max(scale, 0.001) / 2);
                 modeEyebrow.textContent = "FREE EXPLORE";
                 chapterLabel.textContent = `${event.id} · ${event.title}`;
+            }
+
+            function positionDetailForViewport() {
+                const isPortraitMobile = window.matchMedia("(orientation: portrait) and (max-width: 900px)").matches;
+                if (!isPortraitMobile) {
+                    detailDialog.scrollLeft = 0;
+                    detailDialog.scrollTop = 0;
+                    return;
+                }
+
+                detailDialog.scrollLeft = Math.max(0, (detailDialog.scrollWidth - detailDialog.clientWidth) / 2);
+                detailDialog.scrollTop = Math.max(0, detailShell.offsetTop - 12);
             }
 
             function showToast(message) {
@@ -1174,6 +1360,7 @@
                 detailText.removeAttribute("src");
                 detailDialog.showModal();
                 detailClose.focus({ preventScroll: true });
+                requestAnimationFrame(positionDetailForViewport);
 
                 const loaded = await preloadEventDetails(event, "high");
                 if (requestId !== detailRequestId || !detailDialog.open) return;
@@ -1267,7 +1454,10 @@
 
                 window.setTimeout(() => {
                     updateExploreStatus();
-                    showToast("自由探索：左右拖动、滚轮或方向键浏览，点击光点查看详情");
+                    const message = window.matchMedia("(pointer: coarse)").matches
+                        ? "自由探索：左右滑动画卷，点击光点查看详情"
+                        : "自由探索：左右拖动、滚轮或方向键浏览，点击光点查看详情";
+                    showToast(message);
                 }, 2250);
             }
 
@@ -1314,7 +1504,7 @@
 
             window.addEventListener("keydown", (event) => {
                 if (!started || detailDialog.open || event.target.matches("input, button")) return;
-                const step = event.shiftKey ? window.innerWidth * 0.75 : 120;
+                const step = event.shiftKey ? stage.clientWidth * 0.75 : 120;
                 if (["ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End"].includes(event.key)) {
                     event.preventDefault();
                 }
