@@ -302,22 +302,29 @@
             left: max(18px, calc(env(safe-area-inset-left) + 18px));
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             color: rgba(255, 246, 223, 0.92);
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.72);
             letter-spacing: 0.15em;
         }
 
-        .site-mark .seal {
+        .site-mark .brand-badge {
             display: grid;
             place-items: center;
-            width: 31px;
-            height: 31px;
-            color: #f5dfac;
-            font-size: 18px;
-            letter-spacing: 0;
-            border: 1px solid rgba(245, 223, 172, 0.74);
-            background: rgba(112, 35, 24, 0.86);
+            width: 56px;
+            padding: 6px 7px 5px;
+            border: 1px solid rgba(239, 214, 169, 0.68);
+            border-radius: 3px;
+            background: rgba(250, 243, 224, 0.88);
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.26);
+            backdrop-filter: blur(8px);
+        }
+
+        .site-mark .brand-logo {
+            display: block;
+            width: 100%;
+            height: auto;
+            opacity: 0.9;
         }
 
         .site-mark strong {
@@ -552,17 +559,31 @@
             width: min(680px, 90vw);
         }
 
-        .opening-seal {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto 24px;
+        .opening-brand {
+            width: 96px;
+            margin: 0 auto 22px;
+            padding: 10px 12px 7px;
             display: grid;
             place-items: center;
-            color: #f4dfb3;
-            font-size: 31px;
-            border: 1px solid rgba(244, 223, 179, 0.74);
-            background: rgba(137, 45, 30, 0.76);
-            box-shadow: 0 0 34px rgba(180, 95, 39, 0.22);
+            border: 1px solid rgba(239, 214, 169, 0.62);
+            border-radius: 4px;
+            background: rgba(250, 243, 224, 0.92);
+            box-shadow: 0 10px 34px rgba(0, 0, 0, 0.25), 0 0 28px rgba(180, 95, 39, 0.12);
+        }
+
+        .opening-brand img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .opening-brand figcaption {
+            margin-top: 5px;
+            color: rgba(64, 57, 49, 0.7);
+            font-size: 9px;
+            line-height: 1;
+            letter-spacing: 0.32em;
+            text-indent: 0.32em;
         }
 
         .opening-kicker {
@@ -872,8 +893,10 @@
         <div class="reveal-edge right" aria-hidden="true"></div>
 
         <div class="hud">
-            <div class="site-mark" aria-hidden="true">
-                <span class="seal">和</span>
+            <div class="site-mark" aria-label="AGAPASS 出品">
+                <span class="brand-badge" aria-hidden="true">
+                    <img class="brand-logo" src="images/brand/agapass-logo.png" alt="" width="520" height="357">
+                </span>
                 <strong>千年薪火 · 百年和合</strong>
             </div>
 
@@ -903,7 +926,10 @@
 
         <section id="opening" class="opening" aria-labelledby="opening-title">
             <div class="opening-content">
-                <div class="opening-seal" aria-hidden="true">和</div>
+                <figure class="opening-brand">
+                    <img src="images/brand/agapass-logo.png" alt="AGAPASS · A GIFT FROM GOD" width="520" height="357" fetchpriority="high">
+                    <figcaption>出品</figcaption>
+                </figure>
                 <p class="opening-kicker">A JOURNEY THROUGH HISTORY</p>
                 <h1 id="opening-title">千年薪火<br>百年和合</h1>
                 <p class="subtitle">沿一轴古卷，回望基督教传入中国<br>与中文圣经翻译的千年足迹</p>
