@@ -93,7 +93,7 @@ python -m http.server 8000
 
 <https://agapass.github.io/100th_CUV/>
 
-向 `master` 分支推送更新后，GitHub Pages 会自动构建并发布最新页面。项目为纯静态站点，不需要额外安装依赖。
+在仓库的 GitHub Pages 设置中将发布分支设为 `main` 后，后续推送会自动构建并发布最新页面。项目为纯静态站点，不需要额外安装依赖。
 
 ## 出品
 
