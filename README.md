@@ -59,42 +59,6 @@
 
 </details>
 
-## 项目结构
-
-```text
-100th_CUV/
-├─ index.html                  # 页面结构、样式与交互逻辑
-├─ audio/                      # 背景音乐及音乐按钮素材
-├─ images/
-│  ├─ brand/                  # AGAPASS 品牌标识
-│  ├─ layer1/                 # 原始文案与视觉素材
-│  ├─ layer2/                 # 网页使用的横向长卷背景
-│  └─ layer3/
-│     ├─ optimized/           # 网页使用的热点详情 WebP 图片
-│     └─ 热点位置_画板 1.png   # 热点位置校准参考图
-└─ .openai/hosting.json        # OpenAI Sites 静态托管配置
-```
-
-原始图片保留在素材目录中，网页运行时优先调用优化后的版本，以减少热点详情的等待时间。
-
-## 本地预览
-
-克隆仓库后，在项目根目录启动一个静态文件服务器：
-
-```bash
-python -m http.server 8000
-```
-
-然后访问 `http://localhost:8000/`。直接打开 `index.html` 也可以浏览，但使用本地服务器更接近线上环境。
-
-## 部署
-
-线上版本通过 GitHub Pages 发布：
-
-<https://agapass.github.io/100th_CUV/>
-
-在仓库的 GitHub Pages 设置中将发布分支设为 `main` 后，后续推送会自动构建并发布最新页面。项目为纯静态站点，不需要额外安装依赖。
-
 ## 出品
 
 AGAPASS · A GIFT FROM GOD
